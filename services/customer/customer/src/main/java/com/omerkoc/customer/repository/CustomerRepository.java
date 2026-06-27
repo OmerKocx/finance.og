@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.omerkoc.customer.model.Customer;
 
 @Repository
-public interface CustomerRepository extends MongoRepository<Customer, Long> {
+public interface CustomerRepository extends MongoRepository<Customer, String> {
 
 }
