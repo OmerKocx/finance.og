@@ -28,15 +28,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: Username is already taken!");
+                    .body("Error: Email is already taken!");
         }
 
         String role = request.getRole() != null ? request.getRole().toUpperCase() : "USER";
         
         User user = User.builder()
-                .username(request.getUsername())
+                .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
                 .build();
@@ -47,36 +47,36 @@ public class AuthController {
         
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(token)
-                .username(user.getUsername())
+                .email(user.getEmail())
                 .build());
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
         String token = jwtService.generateToken(userDetails);
 
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(token)
-                .username(userDetails.getUsername())
+                .email(userDetails.getUsername())
                 .build());
     }
 
     @GetMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestParam("token") String token) {
         try {
-            String username = jwtService.extractUsername(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            String email = jwtService.extractEmail(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (jwtService.isTokenValid(token, userDetails)) {
                 User user = (User) userDetails;
                 UserDto userDto = UserDto.builder()
                         .id(user.getId())
-                        .username(user.getUsername())
+                        .email(user.getEmail())
                         .role(user.getRole())
                         .build();
                 return ResponseEntity.ok(userDto);
