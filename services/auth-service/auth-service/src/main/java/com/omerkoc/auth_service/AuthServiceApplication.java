@@ -1,13 +1,13 @@
-package com.omerkoc.api_gate_way;
+package com.omerkoc.auth_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApiGateWayApplication {
+public class AuthServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApiGateWayApplication.class, args);
+		SpringApplication.run(AuthServiceApplication.class, args);
 	}
 
 }
