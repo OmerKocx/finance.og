@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.omerkoc.customer.dto.CustomerRequestDto;
 import com.omerkoc.customer.dto.CustomerResponseDto;
+import com.omerkoc.customer.exception.CustomerNotFoundException;
 import com.omerkoc.customer.mapper.CustomerMapper;
 import com.omerkoc.customer.model.Customer;
 import com.omerkoc.customer.repository.CustomerRepository;
@@ -39,13 +40,15 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public CustomerResponseDto getCustomerById(String id) {
-        Customer customer = customerRepository.findById(id).get();
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
         return customerMapper.toCustomerResponseDto(customer);
     }
 
     @Override
     public CustomerResponseDto updateCustomer(String id, CustomerRequestDto customerRequestDto) {
-        Customer customer = customerRepository.findById(id).get();
+        Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
         customer.setName(customerRequestDto.name());
         customer.setEmail(customerRequestDto.email());
         customer.setPhone(customerRequestDto.phone());
@@ -55,6 +58,9 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public void deleteCustomer(String id) {
+        if (!customerRepository.existsById(id)) {
+            throw new CustomerNotFoundException("Customer not found with id: " + id);
+        }
         customerRepository.deleteById(id);
     }
 }

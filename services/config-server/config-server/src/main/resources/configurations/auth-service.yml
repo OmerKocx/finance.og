@@ -1,10 +1,10 @@
 server:
-  port: 8080
+  port: 8082
 
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/user
+    url: jdbc:postgresql://localhost:5444/user
     username: postgres
     password: admin
   jpa:
@@ -12,3 +12,8 @@ spring:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+application:
+  security:
+    jwt:
+      secret-key: "LupHyt72hUvCWSoxznpeN5D96l2npsa0tzVU1rXcUwd"
+      expiration: 86400000 # default 24 hours
