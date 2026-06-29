@@ -18,6 +18,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Spring Security yapılandırma sınıfı. Uygulamanın güvenlik kurallarını,
+ * endpoint izinlerini,
+ * şifreleme yöntemlerini ve JWT filtre entegrasyonunu barındırır.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -26,23 +31,33 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Güvenlik filtre zincirini (SecurityFilterChain) tanımlar.
+     * Hangi URL'lerin korumasız hangilerinin korumalı olduğunu ve filtre
+     * sıralamasını belirtir.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login", "/auth/validate", "/auth/validate-token").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers("/auth/register", "/auth/login", "/auth/validate", "/auth/validate-token")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    /**
+     * Kullanıcı kimlik doğrulama işlemini gerçekleştiren sağlayıcı (Provider)
+     * nesnesi.
+     * Veritabanından kullanıcı verilerini yüklemek için UserDetailsService ve şifre
+     * doğrulaması için PasswordEncoder kullanır.
+     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
@@ -50,11 +65,19 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Spring Security kimlik doğrulama yönetimini (AuthenticationManager) kolayca
+     * yönetmek için kullanılan bean.
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Şifreleri güvenli bir şekilde hash'lemek ve doğrulamak için BCrypt
+     * algoritmasını kullanan şifreleyici.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
