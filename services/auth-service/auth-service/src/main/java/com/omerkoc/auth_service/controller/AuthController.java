@@ -1,14 +1,15 @@
 package com.omerkoc.auth_service.controller;
 
 import com.omerkoc.auth_service.dto.*;
+import com.omerkoc.auth_service.exception.*;
 import com.omerkoc.auth_service.model.User;
 import com.omerkoc.auth_service.repository.UserRepository;
 import com.omerkoc.auth_service.security.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -52,8 +53,7 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         // request email password içerir
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error: Email is already taken!");
+            throw new EmailAlreadyExistsException("Error: Email is already taken!");
         }
 
         String role;
@@ -97,8 +97,12 @@ public class AuthController {
         // 1. Spring Security AuthenticationManager ile email ve şifreyi doğruluyoruz.
         // E-posta bulunamazsa veya şifre yanlışsa bu metot otomatik olarak exception
         // fırlatır ve giriş engellenir.
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        } catch (BadCredentialsException e) {
+            throw new PasswordMismatchException("E-posta veya şifre hatalı!");
+        }
 
         // 2. Doğrulama başarılıysa veritabanından kullanıcı bilgilerini (UserDetails)
         // çekiyoruz
@@ -125,34 +129,27 @@ public class AuthController {
     // loginrequest email ve passowrd ı tutar sadece
     @GetMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestParam("token") String token) {
-        try {
-            // 1. Token içerisinden kullanıcının e-posta adresini (subject) çıkarıyoruz
-            String email = jwtService.extractEmail(token);
+        // 1. Token içerisinden kullanıcının e-posta adresini (subject) çıkarıyoruz
+        String email = jwtService.extractEmail(token);
 
-            // 2. E-posta adresiyle veritabanından kullanıcıyı sorguluyoruz
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        // 2. E-posta adresiyle veritabanından kullanıcıyı sorguluyoruz
+        UserDetails userDetails = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + email));
 
-            // 3. Token'ın geçerliliğini (süre dolumu ve e-posta eşleşmesi) kontrol ediyoruz
-            if (jwtService.isTokenValid(token, userDetails)) {
-                User user = (User) userDetails;
-
-                // 4. Token geçerliyse, diğer mikroservislerin kullanabilmesi için UserDto
-                // nesnesi oluşturup dönüyoruz
-                UserDto userDto = UserDto.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .role(user.getRole())
-                        .build();
-                return ResponseEntity.ok(userDto);
-            }
-
-            // 5. Token geçerli değilse veya uyuşmazlık varsa 401 Unauthorized dönüyoruz
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid or expired");
-        } catch (Exception e) {
-            // 6. Herhangi bir beklenmedik hata durumunda (yanlış token formatı vb.) yine
-            // 401 Unauthorized dönüyoruz
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Token is invalid or expired: " + e.getMessage());
+        // 3. Token'ın geçerliliğini (süre dolumu ve e-posta eşleşmesi) kontrol ediyoruz
+        if (!jwtService.isTokenValid(token, userDetails)) {
+            throw new InvalidTokenException("Token is invalid or expired!");
         }
+
+        User user = (User) userDetails;
+
+        // 4. Token geçerliyse, diğer mikroservislerin kullanabilmesi için UserDto
+        // nesnesi oluşturup dönüyoruz
+        UserDto userDto = UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
+        return ResponseEntity.ok(userDto);
     }
 }
