@@ -55,11 +55,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         try {
             // JWT token'ından kullanıcının e-posta adresini ayrıştırıyoruz.
-            email = jwtService.extractEmail(jwt);
+            email = jwtService.extractEmail(jwt); // jwt servisten e maili aldı
 
             // E-posta adresi null değilse ve kullanıcının oturumu Spring Security
             // Context'te henüz kurulmamışsa (Authentication null ise):
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {// email null değilse
+                                                                                                  // ama context null
+                                                                                                  // ise login
+                                                                                                  // yapıyordur
                 // Veritabanından kullanıcı bilgilerini güncel olarak çekiyoruz.
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
 
