@@ -47,7 +47,8 @@ public class CustomerControllerImpl implements ICustomerController {
 
     @Override
     @PutMapping("/update/{id}")
-    public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable("id") String id, @RequestBody CustomerRequestDto customerRequestDto) {
+    public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable("id") String id,
+            @RequestBody CustomerRequestDto customerRequestDto) {
         return ResponseEntity.ok(customerService.updateCustomer(id, customerRequestDto));
     }
 
