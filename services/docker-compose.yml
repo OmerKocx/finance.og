@@ -1,6 +1,14 @@
 version: "3.8"
 
 services:
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - finance
+
   postgresql:
     container_name: ms_pg_sql
     image: postgres
