@@ -1,0 +1,5 @@
+com\omerkoc\gateway\filter\AuthenticationFilter$Config.class
+com\omerkoc\gateway\filter\AuthenticationFilter.class
+com\omerkoc\gateway\filter\RouteValidator.class
+com\omerkoc\gateway\GatewayApplication.class
+com\omerkoc\gateway\util\JwtUtil.class

@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # Route for Authentication Service (Public / Unsecured)
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
+        # Route for Customer Service (Secured with JWT filter)
+        - id: customer-service
+          uri: lb://customer-service
+          predicates:
+            - Path=/customers/**
+          filters:
+            - AuthenticationFilter
+
+application:
+  security:
+    jwt:
+      secret-key: "LupHyt72hUvCWSoxznpeN5D96l2npsa0tzVU1rXcUwd"
