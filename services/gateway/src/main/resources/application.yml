@@ -5,17 +5,3 @@ spring:
     import: optional:configserver:http://localhost:8888
   main:
     web-application-type: reactive
-
-management:
-  endpoint:
-    gateway:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: gateway
-
-logging:
-  level:
-    org.springframework.cloud.gateway: DEBUG
-    reactor.netty: DEBUG
