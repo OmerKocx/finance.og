@@ -15,6 +15,8 @@ public interface ICustomerController {
 
     ResponseEntity<CustomerResponseDto> getCustomerById(String id);
 
+    ResponseEntity<CustomerResponseDto> getCustomerByEmail(String email);
+
     ResponseEntity<CustomerResponseDto> updateCustomer(String id, CustomerRequestDto customerRequestDto);
 
     ResponseEntity<Void> deleteCustomer(String id);

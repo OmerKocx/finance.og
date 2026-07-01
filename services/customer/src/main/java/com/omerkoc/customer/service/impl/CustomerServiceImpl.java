@@ -46,6 +46,13 @@ public class CustomerServiceImpl implements ICustomerService {
     }
 
     @Override
+    public CustomerResponseDto getCustomerByEmail(String email) {
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with email: " + email));
+        return customerMapper.toCustomerResponseDto(customer);
+    }
+
+    @Override
     public CustomerResponseDto updateCustomer(String id, CustomerRequestDto customerRequestDto) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));

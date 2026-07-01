@@ -46,6 +46,12 @@ public class CustomerControllerImpl implements ICustomerController {
     }
 
     @Override
+    @GetMapping("/email/{email}")
+    public ResponseEntity<CustomerResponseDto> getCustomerByEmail(@PathVariable("email") String email) {
+        return ResponseEntity.ok(customerService.getCustomerByEmail(email));
+    }
+
+    @Override
     @PutMapping("/update/{id}")
     public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable("id") String id,
             @RequestBody CustomerRequestDto customerRequestDto) {

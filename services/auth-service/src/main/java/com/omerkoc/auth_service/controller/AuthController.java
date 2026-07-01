@@ -1,7 +1,10 @@
 package com.omerkoc.auth_service.controller;
 
+import com.omerkoc.auth_service.FeignClient.CustomerDto;
+import com.omerkoc.auth_service.FeignClient.CustomerFeignClient;
 import com.omerkoc.auth_service.dto.*;
 import com.omerkoc.auth_service.exception.*;
+import com.omerkoc.auth_service.mapper.Mapper;
 import com.omerkoc.auth_service.model.User;
 import com.omerkoc.auth_service.repository.UserRepository;
 import com.omerkoc.auth_service.security.JwtService;
@@ -26,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    private final CustomerFeignClient customerFeignClient;
+    private final Mapper mapper;
 
     // Spring Security'nin kimlik doğrulama mekanizmasını tetikleyen yönetici sınıf
     private final AuthenticationManager authenticationManager;
@@ -76,13 +81,18 @@ public class AuthController {
         // 4. Kullanıcıyı veritabanına kaydediyoruz
         userRepository.save(user);
 
-        // 5. Kayıt olan kullanıcı için hemen bir JWT token üretiyoruz
+        // 5. Kullanıcı için müşteri oluşturuyoruz
+        CustomerDto customerDto = mapper.mapToCustomerDto(request);
+        customerFeignClient.createCustomer(customerDto);
+
+        // 6. Kayıt olan kullanıcı için hemen bir JWT token üretiyoruz
         String token = jwtService.generateToken(user);
 
-        // 6. Başarılı HTTP 200 yanıtı ile token ve email bilgisini dönüyoruz
+        // 7. Başarılı HTTP 200 yanıtı ile token, email ve ad bilgisini dönüyoruz
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(token)
                 .email(user.getEmail())
+                .name(request.getFullName())
                 .build());
     }
 
@@ -111,10 +121,22 @@ public class AuthController {
         // 3. Kullanıcıya özel JWT token üretiyoruz
         String token = jwtService.generateToken(userDetails);
 
-        // 4. Token ve kullanıcının e-posta adresini içeren yanıtı dönüyoruz
+        // 4. Müşteri servisinden kullanıcının adını çekiyoruz
+        String name = "";
+        try {
+            CustomerDto customer = customerFeignClient.getCustomerByEmail(userDetails.getUsername());
+            if (customer != null) {
+                name = customer.name();
+            }
+        } catch (Exception e) {
+            // Hata durumunda isim boş bırakılır
+        }
+
+        // 5. Token, kullanıcının e-posta adresini ve adını içeren yanıtı dönüyoruz
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(token)
                 .email(userDetails.getUsername())
+                .name(name)
                 .build());
     }
 

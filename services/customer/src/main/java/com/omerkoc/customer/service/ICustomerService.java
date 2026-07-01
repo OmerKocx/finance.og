@@ -12,6 +12,8 @@ public interface ICustomerService {
 
     CustomerResponseDto getCustomerById(String id);
 
+    CustomerResponseDto getCustomerByEmail(String email);
+
     CustomerResponseDto updateCustomer(String id, CustomerRequestDto customerRequestDto);
 
     void deleteCustomer(String id);

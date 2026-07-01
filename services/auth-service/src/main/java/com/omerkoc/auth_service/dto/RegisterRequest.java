@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RegisterRequest {
 
+    @NotBlank(message = "Full name cannot be blank")
+    private String fullName;
+
     @NotBlank(message = "Email cannot be blank")
     @Email(message = "Email must be a valid email address")
     private String email;
@@ -21,6 +24,9 @@ public class RegisterRequest {
     @NotBlank(message = "Password cannot be blank")
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+
+    @Size(min = 10, message = "Phone number must be at least 10 characters")
+    private String phoneNumber;
 
     private String role; // Optional custom role (e.g. USER, ADMIN)
 }

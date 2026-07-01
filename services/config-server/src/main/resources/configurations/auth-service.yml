@@ -21,4 +21,3 @@ application:
 springdoc:
   api-docs:
     path: /auth/v3/api-docs
-
