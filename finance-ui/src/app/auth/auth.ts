@@ -8,7 +8,7 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [FormsModule], // HTML şablonunda [(ngModel)] veya input bağlama kullanabilmek için gerekli
   templateUrl: './auth.html',
-  styleUrl: './auth.scss'
+  styleUrl: './auth.scss',
 })
 export class AuthComponent {
   // Bağımlılıkları (Router ve AuthService) bileşene enjekte ediyoruz
@@ -41,7 +41,7 @@ export class AuthComponent {
   readonly passwordStrength = computed(() => {
     const pass = this.password();
     if (!pass) return 0;
-    
+
     let score = 0;
     if (pass.length >= 8) score++; // En az 8 karakter
     if (/[A-Z]/.test(pass)) score++; // Büyük harf içeriyor mu
@@ -69,13 +69,13 @@ export class AuthComponent {
     this.password.set('');
     this.confirmPassword.set('');
     this.showPassword.set(false);
-    
+
     this.mode.set(this.mode() === 'login' ? 'register' : 'login');
   }
 
   // toggleShowPassword: Şifrenin görünürlüğünü tersine çevirir.
   toggleShowPassword(): void {
-    this.showPassword.update(show => !show);
+    this.showPassword.update((show) => !show);
   }
 
   // onSubmit: Form submit edildiğinde çalışacak ana tetikleyici.
@@ -119,9 +119,10 @@ export class AuthComponent {
         this.loading.set(false);
         console.error('Giriş hatası:', err);
         // Spring Boot'tan dönen hata mesajını göster (örn: BadCredentialsException sonucu)
-        const msg = err.error?.message || err.error || 'Giriş yapılamadı. E-posta veya şifre hatalı.';
+        const msg =
+          err.error?.message || err.error || 'Giriş yapılamadı. E-posta veya şifre hatalı.';
         this.errorMessage.set(msg);
-      }
+      },
     });
   }
 
@@ -162,7 +163,7 @@ export class AuthComponent {
         this.loading.set(false);
         this.authService.saveSession(res); // Kayıt olunca otomatik giriş yapması için token'ı kaydet
         this.successMessage.set('Kayıt başarıyla tamamlandı! Yönlendiriliyorsunuz...');
-        
+
         // 1.5 saniye sonra kullanıcıyı panele yönlendir
         setTimeout(() => {
           this.router.navigate(['/dashboard']);
@@ -172,9 +173,12 @@ export class AuthComponent {
         this.loading.set(false);
         console.error('Kayıt hatası:', err);
         // E-posta benzersizlik hatası vb. durumları ekranda gösterir
-        const msg = err.error?.message || err.error || 'Kayıt başarısız. E-posta adresi zaten kullanımda olabilir.';
+        const msg =
+          err.error?.message ||
+          err.error ||
+          'Kayıt başarısız. E-posta adresi zaten kullanımda olabilir.';
         this.errorMessage.set(msg);
-      }
+      },
     });
   }
 
