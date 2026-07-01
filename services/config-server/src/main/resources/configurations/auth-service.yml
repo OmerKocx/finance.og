@@ -17,3 +17,8 @@ application:
     jwt:
       secret-key: "LupHyt72hUvCWSoxznpeN5D96l2npsa0tzVU1rXcUwd"
       expiration: 86400000 # default 24 hours
+
+springdoc:
+  api-docs:
+    path: /auth/v3/api-docs
+

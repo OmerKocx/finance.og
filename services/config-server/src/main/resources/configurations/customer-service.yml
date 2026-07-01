@@ -10,3 +10,8 @@ spring:
 
 server:
   port: 8090
+
+springdoc:
+  api-docs:
+    path: /customers/v3/api-docs
+

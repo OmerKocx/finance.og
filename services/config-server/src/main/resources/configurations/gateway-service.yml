@@ -26,3 +26,13 @@ application:
     jwt:
       secret-key: "LupHyt72hUvCWSoxznpeN5D96l2npsa0tzVU1rXcUwd"
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: auth-service
+        url: /auth/v3/api-docs
+      - name: customer-service
+        url: /customers/v3/api-docs
+
+
