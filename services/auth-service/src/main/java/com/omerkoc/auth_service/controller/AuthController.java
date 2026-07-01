@@ -8,6 +8,8 @@ import com.omerkoc.auth_service.mapper.Mapper;
 import com.omerkoc.auth_service.model.User;
 import com.omerkoc.auth_service.repository.UserRepository;
 import com.omerkoc.auth_service.security.JwtService;
+import com.omerkoc.auth_service.service.KafkaProducerService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +42,8 @@ public class AuthController {
 
     // Veritabanı işlemleri için kullanıcı reposu
     private final UserRepository userRepository;
+
+    private final KafkaProducerService kafkaProducerService;
 
     // Şifreleri BCrypt ile güvenli şekilde hash'lemek için kullanılan encoder
     private final PasswordEncoder passwordEncoder;
@@ -87,6 +91,9 @@ public class AuthController {
 
         // 6. Kayıt olan kullanıcı için hemen bir JWT token üretiyoruz
         String token = jwtService.generateToken(user);
+        // Kafka'ya Kayıt Event'i gönder
+        // Kafka'ya Kayıt Event'i gönder
+        kafkaProducerService.sendRegisterEvent(new UserRegisterEvent(request.getFullName(), request.getEmail()));
 
         // 7. Başarılı HTTP 200 yanıtı ile token, email ve ad bilgisini dönüyoruz
         return ResponseEntity.ok(AuthResponse.builder()
@@ -131,6 +138,8 @@ public class AuthController {
         } catch (Exception e) {
             // Hata durumunda isim boş bırakılır
         }
+        // Kafka'ya Giriş Event'i gönder
+        kafkaProducerService.sendLoginEvent(new UserLoginEvent(userDetails.getUsername()));
 
         // 5. Token, kullanıcının e-posta adresini ve adını içeren yanıtı dönüyoruz
         return ResponseEntity.ok(AuthResponse.builder()
