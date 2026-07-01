@@ -12,13 +12,18 @@ This repository implements a backend service architecture designed for financial
 
 ## 🏗️ Architecture & Component Services
 
-The system is split into four primary microservices and a Dockerized infrastructure layer:
+The system is split into five primary microservices, a frontend application, and a Dockerized infrastructure layer:
 
 ```mermaid
 graph TD
+    UI[Finance UI: 4200] --> GW[Gateway: 8080]
     CS[Config Server: 8888] --> DS[Discovery Service: 8761]
+    CS --> GW
     CS --> AS[Auth Service: 8082]
     CS --> CUST[Customer Service: 8090]
+
+    GW -->|/auth/**| AS
+    GW -->|/customers/**| CUST
 
     AS -->|Register/Validate| DB_PG[(PostgreSQL: 5444)]
     CUST -->|Customer CRUD| DB_MONGO[(MongoDB: 27017)]
@@ -34,6 +39,7 @@ graph TD
   - `auth-service.yml` (PostgreSQL connection strings, JPA setup, JWT secret & expiration)
   - `customer-service.yml` (MongoDB connection credentials and databases)
   - `discovery-service.yml` (Eureka Registry configuration)
+  - `gateway-service.yml` (Gateway routes, JWT security filter configurations)
 
 ### 2. Service Discovery Registry (`discovery`)
 
@@ -48,9 +54,9 @@ graph TD
 - **Purpose:** Handles application security, user registration, credentials checking, and token issuance/validation.
 - **Database:** PostgreSQL (running in Docker container `ms_pg_sql` at port `5444`)
 - **Key Endpoints:**
-  - `POST /auth/register` - Register a new user (generates JWT token)
-  - `POST /auth/login` - Logs in a user, returning a JWT token
-  - `GET /auth/validate?token=<jwt-token>` - Validates standard JWT tokens and outputs a `UserDto` containing ID, Email, and Roles
+  - `POST /auth/register` - Register a new user (generates JWT token + customer profile)
+  - `POST /auth/login` - Logs in a user, returning a JWT token and user name
+  - `GET /auth/validate?token=<jwt-token>` - Validates standard JWT tokens and outputs user metadata for gateway verification
 
 ### 4. Customer Service (`customer`)
 
@@ -62,9 +68,21 @@ graph TD
   - `POST /create` - Create a new customer profile
   - `GET /list` - List all registered customers
   - `GET /get/{id}` - Retrieve details of a customer by ID
+  - `GET /email/{email}` - Retrieve details of a customer by Email (used by Auth on login)
   - `PUT /update/{id}` - Update a customer's name, email, or phone number
   - `DELETE /delete/{id}` - Delete a customer profile
-- **API Documentation:** OpenAPI is integrated. Access Swagger UI at `http://localhost:8090/swagger-ui/index.html` once the service is running.
+
+### 5. API Gateway Service (`gateway`)
+
+- **Port:** `8080`
+- **Technology:** Spring Cloud Gateway, Reactive Webflux
+- **Purpose:** Serves as the single unified entry point for API calls. Routes public paths (`/auth/**`) directly and secures sensitive paths (`/customers/**`) by passing them through a custom JWT `AuthenticationFilter`.
+
+### 6. Frontend Portal (`finance-ui`)
+
+- **Port:** `4200`
+- **Technology:** Angular 19+ (Reactive Signals, Component Architecture), Sass
+- **Purpose:** Premium modern dark-themed user portal. Handles user authentication flow, stores session metadata, dynamically renders profile badges/initials, and displays balance, analytics graph, and recent transaction feeds.
 
 ---
 
@@ -87,6 +105,7 @@ A `docker-compose.yml` file is provided in the `services/` directory to quickly 
 
 - Java 21 JDK or higher
 - Maven 3.x+
+- Node.js (v18+) and npm
 - Docker Desktop installed and running
 
 ### Step 1: Start the Infrastructure Databases
@@ -98,14 +117,9 @@ cd services
 docker-compose up -d
 ```
 
-You can access:
+### Step 2: Start Backend Services in Order
 
-- pgAdmin: `http://localhost:5050` (Login: `pgadmin4@pgadmin.org` / Password: `admin`)
-- Mongo Express: `http://localhost:8081` (Login: `glaymet` / Password: `glaymet`)
-
-### Step 2: Start Services in Order
-
-Start the services in the following order to allow proper loading:
+Start the services in the following order to allow config mapping and discovery registration:
 
 1. **Config Server:**
    ```bash
@@ -127,8 +141,25 @@ Start the services in the following order to allow proper loading:
    cd services/customer
    mvn spring-boot:run
    ```
+5. **API Gateway:**
+   ```bash
+   cd services/gateway
+   mvn spring-boot:run
+   ```
 
 Verify all running instances register successfully in the Eureka Dashboard at `http://localhost:8761`.
+
+### Step 3: Start the Angular Frontend
+
+Navigate to the `finance-ui` directory, install dependencies, and start the development server:
+
+```bash
+cd finance-ui
+npm install
+npm start
+```
+
+Access the UI panel in your browser at `http://localhost:4200`.
 
 ---
 
@@ -140,4 +171,4 @@ Verify all running instances register successfully in the Eureka Dashboard at `h
     config:
       import: "optional:configserver:http://localhost:8888"
   ```
-- **Stateless Security:** `auth-service` uses stateless session management with BCrypt password hashing and JWT token filtration.
+- **Stateless Security:** `auth-service` uses stateless session management with BCrypt password hashing and JWT token filtration. Gateway applies token verification filter globally on protected endpoints.
