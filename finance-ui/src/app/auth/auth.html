@@ -1,0 +1,231 @@
+<div class="auth-container">
+  <!-- Glowing blobs strictly scoped inside the container to overlay correctly -->
+  <div class="ambient-bg"></div>
+
+  <div class="auth-card-wrapper">
+    <div class="auth-card">
+      <!-- Card Header / Brand -->
+      <div class="auth-header">
+        <div class="brand-logo">
+          <!-- Sleek monochrome geometric logo -->
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2" fill="var(--primary)"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </div>
+        <h1>{{ isLogin() ? 'Giriş Yap' : 'Kayıt Ol' }}</h1>
+        <p class="subtitle">
+          {{ isLogin() ? 'Finansal kontrolünüzü elinize almak için giriş yapın.' : 'Yeni bir finansal başlangıç için hesabınızı oluşturun.' }}
+        </p>
+      </div>
+
+      <!-- Alerts -->
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <!-- Main Form -->
+      <form (submit)="onSubmit(); $event.preventDefault()" class="auth-form">
+        @if (!isLogin()) {
+          <!-- Name Field -->
+          <div class="form-group anim-fade-in">
+            <label for="name">Ad Soyad</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <input 
+                id="name" 
+                type="text" 
+                placeholder="Ahmet Yılmaz" 
+                [value]="name()" 
+                (input)="name.set($any($event.target).value)"
+                [disabled]="loading()"
+                required
+              />
+            </div>
+          </div>
+
+          <!-- Phone Field -->
+          <div class="form-group anim-fade-in">
+            <label for="phone">Telefon Numarası</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              <input 
+                id="phone" 
+                type="tel" 
+                placeholder="0555 555 5555" 
+                [value]="phone()" 
+                (input)="phone.set($any($event.target).value)"
+                [disabled]="loading()"
+                required
+              />
+            </div>
+          </div>
+        }
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="email">E-posta Adresi</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <input 
+              id="email" 
+              type="email" 
+              placeholder="isim@example.com" 
+              [value]="email()" 
+              (input)="email.set($any($event.target).value)"
+              [disabled]="loading()"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <div class="label-row">
+            <label for="password">Şifre</label>
+            @if (isLogin()) {
+              <a href="javascript:void(0)" class="forgot-pass-link">Şifremi Unuttum</a>
+            }
+          </div>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <input 
+              id="password" 
+              [type]="showPassword() ? 'text' : 'password'" 
+              placeholder="••••••••" 
+              [value]="password()" 
+              (input)="password.set($any($event.target).value)"
+              [disabled]="loading()"
+              required
+            />
+            <button 
+              type="button" 
+              class="eye-btn" 
+              (click)="toggleShowPassword()" 
+              aria-label="Şifreyi Göster/Gizle"
+            >
+              @if (showPassword()) {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              }
+            </button>
+          </div>
+
+          <!-- Password Strength Indicator (Register Mode Only) -->
+          @if (!isLogin() && password()) {
+            <div class="strength-meter anim-fade-in">
+              <div class="meter-bars">
+                <span class="bar" [class.active]="passwordStrength() >= 1" [attr.data-strength]="passwordStrength()"></span>
+                <span class="bar" [class.active]="passwordStrength() >= 2" [attr.data-strength]="passwordStrength()"></span>
+                <span class="bar" [class.active]="passwordStrength() >= 3" [attr.data-strength]="passwordStrength()"></span>
+                <span class="bar" [class.active]="passwordStrength() >= 4" [attr.data-strength]="passwordStrength()"></span>
+              </div>
+              <span class="strength-label text-dim">
+                Şifre Gücü: <strong class="strength-text" [attr.data-strength]="passwordStrength()">{{ passwordStrengthText() }}</strong>
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- Confirm Password Field (Register Mode Only) -->
+        @if (!isLogin()) {
+          <div class="form-group anim-fade-in">
+            <label for="confirmPassword">Şifreyi Onayla</label>
+            <div class="input-wrapper">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input 
+                id="confirmPassword" 
+                [type]="showPassword() ? 'text' : 'password'" 
+                placeholder="••••••••" 
+                [value]="confirmPassword()" 
+                (input)="confirmPassword.set($any($event.target).value)"
+                [disabled]="loading()"
+                required
+              />
+            </div>
+          </div>
+        }
+
+        <!-- Remember Me (Login Mode Only) -->
+        @if (isLogin()) {
+          <div class="form-options">
+            <label class="checkbox-container">
+              <input 
+                type="checkbox" 
+                [checked]="rememberMe()" 
+                (change)="rememberMe.set($any($event.target).checked)"
+                [disabled]="loading()"
+              />
+              <span class="checkmark"></span>
+              <span class="checkbox-label">Beni Hatırla</span>
+            </label>
+          </div>
+        }
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" [disabled]="loading()">
+          @if (loading()) {
+            <span class="loader-spinner"></span>
+            <span>İşleniyor...</span>
+          } @else {
+            <span>{{ isLogin() ? 'Giriş Yap' : 'Kayıt Ol' }}</span>
+          }
+        </button>
+      </form>
+
+      <!-- Toggle Mode Link -->
+      <div class="auth-footer">
+        @if (isLogin()) {
+          <p>
+            Hesabın yok mu? 
+            <button type="button" class="link-btn" (click)="toggleMode()" [disabled]="loading()">Kaydol</button>
+          </p>
+        } @else {
+          <p>
+            Zaten hesabın var mı? 
+            <button type="button" class="link-btn" (click)="toggleMode()" [disabled]="loading()">Giriş Yap</button>
+          </p>
+        }
+      </div>
+    </div>
+  </div>
+</div>
