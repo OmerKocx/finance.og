@@ -1,22 +1,26 @@
+server:
+  port: 8085
+
 # Kafka Ayarları
 spring:
   kafka:
-    bootstrap-servers: ms_kafka:29092
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: notification-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
     properties:
       spring.json.trusted.packages: "*"
-# Mail Gönderim Ayarları
-mail:
-  host: smtp.gmail.com # Kullandığın SMTP sağlayıcı
-  port: 587
-  username: 36omerkoc3634@gmail.com
-  password: ckebbvscbqvlgqzf # Gmail için Uygulama Şifresi
-  properties:
-    mail:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
+  # Mail Gönderim Ayarları
+  mail:
+    host: smtp.gmail.com # Kullandığın SMTP sağlayıcı
+    port: 587
+    username: 36omerkoc3634@gmail.com
+    password: tlefbrfjobkyohyt
+    # Gmail için Uygulama Şifresi
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

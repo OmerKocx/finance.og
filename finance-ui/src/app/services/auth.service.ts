@@ -27,7 +27,13 @@ export class AuthService {
 
   // register: E-posta, şifre, ad-soyad, telefon ve opsiyonel rolü Spring Boot'a post eder.
   register(email: string, password: string, name: string, phone: string, role: string = 'USER'): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, { email, password, name, phone, role });
+    return this.http.post<AuthResponse>(`${this.baseUrl}/register`, { 
+      email, 
+      password, 
+      fullName: name, 
+      phoneNumber: phone, 
+      role 
+    });
   }
 
   // saveSession: Başarılı giriş/kayıt sonrasında backend'in döndüğü JWT Token, Email ve Ad bilgisini tarayıcı hafızasına (localStorage) yazar.

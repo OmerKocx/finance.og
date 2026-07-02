@@ -118,9 +118,8 @@ export class AuthComponent {
       error: (err) => {
         this.loading.set(false);
         console.error('Giriş hatası:', err);
-        // Spring Boot'tan dönen hata mesajını göster (örn: BadCredentialsException sonucu)
-        const msg =
-          err.error?.message || err.error || 'Giriş yapılamadı. E-posta veya şifre hatalı.';
+        // Spring Boot'tan veya custom handler'dan dönen hata mesajını göster
+        const msg = this.getErrorMessage(err) || 'Giriş yapılamadı. E-posta veya şifre hatalı.';
         this.errorMessage.set(msg);
       },
     });
@@ -172,14 +171,33 @@ export class AuthComponent {
       error: (err) => {
         this.loading.set(false);
         console.error('Kayıt hatası:', err);
-        // E-posta benzersizlik hatası vb. durumları ekranda gösterir
-        const msg =
-          err.error?.message ||
-          err.error ||
-          'Kayıt başarısız. E-posta adresi zaten kullanımda olabilir.';
+        const msg = this.getErrorMessage(err) || 'Kayıt başarısız. E-posta adresi zaten kullanımda olabilir.';
         this.errorMessage.set(msg);
       },
     });
+  }
+
+  // getErrorMessage: Backend'den dönen nested veya düz hata mesajlarını akıllıca parse eder.
+  private getErrorMessage(err: any): string {
+    if (!err) return '';
+    const errorBody = err.error;
+    if (errorBody) {
+      if (typeof errorBody === 'string') {
+        return errorBody;
+      }
+      // GlobalExceptionHandler'dan dönen ErrorResponse (errors: { message: "..." })
+      if (errorBody.errors && errorBody.errors.message) {
+        return errorBody.errors.message;
+      }
+      // Standart Spring Boot veya diğer hata gövdeleri (message: "...")
+      if (errorBody.message) {
+        return errorBody.message;
+      }
+    }
+    if (err.message) {
+      return err.message;
+    }
+    return '';
   }
 
   // isValidEmail: Basit regex e-posta format doğrulaması.
