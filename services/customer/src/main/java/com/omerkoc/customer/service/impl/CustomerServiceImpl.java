@@ -14,9 +14,11 @@ import com.omerkoc.customer.repository.CustomerRepository;
 import com.omerkoc.customer.service.ICustomerService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerServiceImpl implements ICustomerService {
 
     private final CustomerRepository customerRepository;
@@ -24,9 +26,16 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public CustomerResponseDto createCustomer(CustomerRequestDto customerRequestDto) {
-        Customer customer = customerMapper.toCustomer(customerRequestDto);
-        Customer savedCustomer = customerRepository.save(customer);
-        return customerMapper.toCustomerResponseDto(savedCustomer);
+        log.info("Creating customer with email: {} and name: {}", customerRequestDto.email(), customerRequestDto.name());
+        try {
+            Customer customer = customerMapper.toCustomer(customerRequestDto);
+            Customer savedCustomer = customerRepository.save(customer);
+            log.info("Customer successfully created in MongoDB with ID: {}", savedCustomer.getId());
+            return customerMapper.toCustomerResponseDto(savedCustomer);
+        } catch (Exception e) {
+            log.error("Failed to save customer to MongoDB: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     @Override

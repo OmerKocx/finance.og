@@ -6,11 +6,12 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: notification-group
+      group-id: notification-group-v2
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
     properties:
       spring.json.trusted.packages: "*"
+      spring.json.type.mapping: "userRegisterEvent:com.omerkoc.notification.dto.UserRegisterEvent,userLoginEvent:com.omerkoc.notification.dto.UserLoginEvent"
   # Mail Gönderim Ayarları
   mail:
     host: smtp.gmail.com # Kullandığın SMTP sağlayıcı

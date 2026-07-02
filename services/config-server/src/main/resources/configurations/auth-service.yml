@@ -19,7 +19,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.add.type.headers: false
+        spring.json.type.mapping: "userRegisterEvent:com.omerkoc.auth_service.dto.UserRegisterEvent,userLoginEvent:com.omerkoc.auth_service.dto.UserLoginEvent"
 
 application:
   security:

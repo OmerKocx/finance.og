@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import java.util.Optional;
 
 @Service
@@ -20,8 +21,14 @@ public class KafkaNotificationConsumer {
     private final EmailService emailService;
     private final ICustomerClient customerClient;
 
+    @PostConstruct
+    public void init() {
+        log.info("KafkaNotificationConsumer bean has been initialized!");
+    }
+
+
     // 1. Register Listener
-    @KafkaListener(topics = "user-registration-topic", groupId = "notification-group")
+    @KafkaListener(topics = "user-registration-topic", groupId = "${spring.kafka.consumer.group-id:notification-group}")
     public void consumeRegisterEvent(UserRegisterEvent event) {
         log.info("User registration event received: {}", event);
 
@@ -32,7 +39,7 @@ public class KafkaNotificationConsumer {
     }
 
     // 2. Login Listener
-    @KafkaListener(topics = "user-login-topic", groupId = "notification-group")
+    @KafkaListener(topics = "user-login-topic", groupId = "${spring.kafka.consumer.group-id:notification-group}")
     public void consumeLoginEvent(UserLoginEvent event) {
         log.info("User login event received: {}", event);
 
