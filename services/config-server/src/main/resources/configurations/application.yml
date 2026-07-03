@@ -12,6 +12,10 @@ spring:
       override-system-properties: false
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
   tracing:
     enabled: true
     sampling:

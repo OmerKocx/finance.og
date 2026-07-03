@@ -20,4 +20,6 @@ public interface ICustomerController {
     ResponseEntity<CustomerResponseDto> updateCustomer(String id, CustomerRequestDto customerRequestDto);
 
     ResponseEntity<Void> deleteCustomer(String id);
+
+    ResponseEntity<CustomerResponseDto> getCustomerByPhone(String phone);
 }

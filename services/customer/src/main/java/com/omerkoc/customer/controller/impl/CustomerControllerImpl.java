@@ -65,4 +65,10 @@ public class CustomerControllerImpl implements ICustomerController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
+    @GetMapping("/phone/{phone}")
+    public ResponseEntity<CustomerResponseDto> getCustomerByPhone(@PathVariable("phone") String phone) {
+        return ResponseEntity.ok(customerService.getCustomerByPhone(phone));
+    }
+
 }

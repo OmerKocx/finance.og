@@ -15,11 +15,13 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    // full name ve email
     public void sendRegisterEvent(UserRegisterEvent event) {
         log.info("Sending user registration event to Kafka: {}", event);
         kafkaTemplate.send("user-registration-topic", event);
     }
 
+    // email
     public void sendLoginEvent(UserLoginEvent event) {
         log.info("Sending user login event to Kafka: {}", event);
         kafkaTemplate.send("user-login-topic", event);

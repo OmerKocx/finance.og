@@ -17,4 +17,6 @@ public interface ICustomerService {
     CustomerResponseDto updateCustomer(String id, CustomerRequestDto customerRequestDto);
 
     void deleteCustomer(String id);
+
+    CustomerResponseDto getCustomerByPhone(String phone);
 }

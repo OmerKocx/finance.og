@@ -1,174 +1,100 @@
-# My Finance - Microservices Project
+# My Finance - Mikroservis Projesi
 
-A modern, robust financial microservices system built using **Java 21**, **Spring Boot 4.x**, **Spring Cloud (2025.x)**, **Docker**, and modern security/database standards.
-
----
-
-## 📌 Project Overview
-
-This repository implements a backend service architecture designed for financial/customer management. It leverages Spring Cloud to manage service discovery and centralized configuration, alongside containerized PostgreSQL and MongoDB databases.
+Bu proje; **Java 21**, **Spring Boot**, **Spring Cloud** ve **Kafka** mimarileri kullanılarak geliştirilmiş, ölçeklenebilir ve modern bir finansal arka plan (backend) sistemidir. Projede servisler arası asenkron iletişim, merkezi yapılandırma yönetimi, servis keşfi (discovery) ve güvenli kimlik doğrulama mekanizmaları uygulanmıştır.
 
 ---
 
-## 🏗️ Architecture & Component Services
+## 🏗️ Genel Mimari Şema
 
-The system is split into five primary microservices, a frontend application, and a Dockerized infrastructure layer:
+Sistem; istemci (UI) isteklerinin tek bir kapıdan alınması, servislerin birbirini dinamik olarak keşfetmesi ve bazı işlemlerin asenkron (Kafka aracılığıyla) yürütülmesi üzerine kurulmuştur:
 
 ```mermaid
 graph TD
-    UI[Finance UI: 4200] --> GW[Gateway: 8080]
-    CS[Config Server: 8888] --> DS[Discovery Service: 8761]
-    CS --> GW
-    CS --> AS[Auth Service: 8082]
-    CS --> CUST[Customer Service: 8090]
+    %% İstemci ve Gateway
+    UI[Finance UI Portal] -->|API İstekleri| GW[API Gateway]
 
+    %% Altyapı Servisleri
+    CS[Config Server] -->|Merkezi Konfigürasyon Dağıtımı| GW
+    CS -->|Merkezi Konfigürasyon Dağıtımı| AS[Auth Service]
+    CS -->|Merkezi Konfigürasyon Dağıtımı| CUST[Customer Service]
+    CS -->|Merkezi Konfigürasyon Dağıtımı| NOTIF[Notification Service]
+    
+    DS[Discovery Registry] <-->|Dinamik Kayıt & Keşif| GW
+    DS <-->|Dinamik Kayıt & Keşif| AS
+    DS <-->|Dinamik Kayıt & Keşif| CUST
+    DS <-->|Dinamik Kayıt & Keşif| NOTIF
+
+    %% Gateway Yönlendirmeleri
     GW -->|/auth/**| AS
-    GW -->|/customers/**| CUST
+    GW -->|/customers/** (JWT Korumalı)| CUST
 
-    AS -->|Register/Validate| DB_PG[(PostgreSQL: 5444)]
-    CUST -->|Customer CRUD| DB_MONGO[(MongoDB: 27017)]
+    %% Servislerin Veritabanları
+    AS -->|Kullanıcı Bilgileri| DB_PG[(PostgreSQL)]
+    CUST -->|Müşteri Profilleri| DB_MONGO[(MongoDB)]
+
+    %% Feign İletişimi
+    AS -.->|Feign Client: Müşteri Oluştur/Sorgula| CUST
+
+    %% Asenkron Olay Akışı (Kafka)
+    AS -->|Kayıt/Giriş Eventleri| KAFKA{{Kafka Broker}}
+    KAFKA -->|Mesaj Tüketimi| NOTIF
+    NOTIF -->|SMTP Protokolü| MAIL[E-posta Sunucusu]
 ```
 
-### 1. Centralized Configuration Server (`config-server`)
+---
 
-- **Port:** `8888`
-- **Technology:** Spring Cloud Config Server
-- **Purpose:** Acts as a centralized configuration repository for all microservices using the `native` profile. Configuration files are stored under its resources (`classpath:/configurations`) and served dynamically.
-- **Key Config Files Managed:**
-  - `application.yml` (Common configurations, Eureka zones)
-  - `auth-service.yml` (PostgreSQL connection strings, JPA setup, JWT secret & expiration)
-  - `customer-service.yml` (MongoDB connection credentials and databases)
-  - `discovery-service.yml` (Eureka Registry configuration)
-  - `gateway-service.yml` (Gateway routes, JWT security filter configurations)
+## 🧩 Servisler ve Görevleri
 
-### 2. Service Discovery Registry (`discovery`)
+Sistem, her biri tek bir sorumluluğa (Single Responsibility) sahip mikroservislerin bir araya gelmesiyle çalışır:
 
-- **Port:** `8761`
-- **Technology:** Netflix Eureka Server
-- **Purpose:** Registers all microservice instances dynamically, allowing them to locate and communicate with each other without hardcoding network addresses.
+### 1. Yapılandırma Sunucusu (`config-server`)
+* **Görevi:** Tüm mikroservislerin konfigürasyon dosyalarını (`application.yml` vb.) tek bir merkezden yönetir.
+* **Çalışma Şekli:** Servisler ilk ayağa kalktıklarında bu sunucuya bağlanarak kendilerine ait veritabanı bağlantı bilgilerini, port ayarlarını ve özel tanımlarını çekerler.
 
-### 3. Authentication Service (`auth-service`)
+### 2. Hizmet Kayıt Defteri (`discovery-service`)
+* **Görevi:** Sistemdeki tüm mikroservislerin dinamik olarak kayıt olduğu ve birbirlerinin IP/Port bilgilerini öğrendiği Eureka sunucusudur.
+* **Çalışma Şekli:** Bir servis diğerine istek atacağı zaman (örneğin Auth servisinin Müşteri servisine bağlanması) doğrudan IP yazmak yerine Eureka üzerinden isme göre dinamik yönlendirme yapar.
 
-- **Port:** `8082`
-- **Technology:** Spring Security, JWT (JSON Web Tokens), JPA, PostgreSQL
-- **Purpose:** Handles application security, user registration, credentials checking, and token issuance/validation.
-- **Database:** PostgreSQL (running in Docker container `ms_pg_sql` at port `5444`)
-- **Key Endpoints:**
-  - `POST /auth/register` - Register a new user (generates JWT token + customer profile)
-  - `POST /auth/login` - Logs in a user, returning a JWT token and user name
-  - `GET /auth/validate?token=<jwt-token>` - Validates standard JWT tokens and outputs user metadata for gateway verification
+### 3. API Geçidi (`gateway`)
+* **Görevi:** Dış dünyaya açılan tek kapıdır. İstemciden (Frontend) gelen tüm istekleri karşılar ve ilgili servislere yönlendirir.
+* **Güvenlik:** Giriş (Login) ve Kayıt (Register) dışındaki korumalı servislere (Müşteri bilgileri gibi) erişim isteklerini yakalar, JWT (JSON Web Token) kontrolünü yapar ve sadece geçerli token'a sahip isteklerin geçişine izin verir.
 
-### 4. Customer Service (`customer`)
+### 4. Kimlik Doğrulama Servisi (`auth-service`)
+* **Görevi:** Kullanıcı üyelik işlemlerini, sisteme giriş kontrollerini ve güvenlik tokenı (JWT) üretimini yönetir.
+* **Veritabanı:** Kullanıcı adı, şifre hash'leri (BCrypt) ve yetkileri **PostgreSQL** üzerinde saklanır.
+* **Kafka Entegrasyonu:** Bir kullanıcı başarıyla kayıt olduğunda veya giriş yaptığında bunu sisteme duyurmak için Kafka'ya birer olay (Event) fırlatır.
 
-- **Port:** `8090`
-- **Technology:** Spring Data MongoDB, OpenAPI/Swagger UI
-- **Purpose:** Exposes CRUD operations for customer details.
-- **Database:** MongoDB (running in Docker container `mongo_db` at port `27017`)
-- **Key Endpoints (`/customers/api/v1`):**
-  - `POST /create` - Create a new customer profile
-  - `GET /list` - List all registered customers
-  - `GET /get/{id}` - Retrieve details of a customer by ID
-  - `GET /email/{email}` - Retrieve details of a customer by Email (used by Auth on login)
-  - `PUT /update/{id}` - Update a customer's name, email, or phone number
-  - `DELETE /delete/{id}` - Delete a customer profile
+### 5. Müşteri Yönetim Servisi (`customer`)
+* **Görevi:** Müşterilerin detaylı profil bilgilerini (ad, soyad, telefon vb.) yönetir.
+* **Veritabanı:** İlişkisel olmayan, esnek yapılı **MongoDB** üzerinde verileri saklar.
 
-### 5. API Gateway Service (`gateway`)
-
-- **Port:** `8080`
-- **Technology:** Spring Cloud Gateway, Reactive Webflux
-- **Purpose:** Serves as the single unified entry point for API calls. Routes public paths (`/auth/**`) directly and secures sensitive paths (`/customers/**`) by passing them through a custom JWT `AuthenticationFilter`.
-
-### 6. Frontend Portal (`finance-ui`)
-
-- **Port:** `4200`
-- **Technology:** Angular 19+ (Reactive Signals, Component Architecture), Sass
-- **Purpose:** Premium modern dark-themed user portal. Handles user authentication flow, stores session metadata, dynamically renders profile badges/initials, and displays balance, analytics graph, and recent transaction feeds.
+### 6. Bildirim Servisi (`notification`)
+* **Görevi:** Kullanıcılara gönderilecek sistem bildirimlerini yönetir.
+* **Çalışma Şekli:** Kafka üzerindeki ilgili konuları (Topic) dinler. Yeni bir kullanıcı kayıt olduğunda ya da sisteme giriş yapıldığında bu olayları yakalayarak kullanıcıya otomatik olarak hoş geldin ya da güvenlik uyarı e-postaları gönderir.
 
 ---
 
-## 🐳 Infrastructure & Docker Setup
+## 🔄 Sistem Nasıl Çalışır? (Kayıt ve Bildirim Akışı)
 
-A `docker-compose.yml` file is provided in the `services/` directory to quickly spin up the required databases and their UI administration tools:
-
-| Service           | Container Name  | Host Port | Internal Port | Description                           |
-| :---------------- | :-------------- | :-------- | :------------ | :------------------------------------ |
-| **PostgreSQL**    | `ms_pg_sql`     | `5444`    | `5432`        | Relational DB for user authentication |
-| **pgAdmin4**      | `ms_pgadmin`    | `5050`    | `80`          | Web administration UI for PostgreSQL  |
-| **MongoDB**       | `mongo_db`      | `27017`   | `27017`       | Document DB for customer records      |
-| **Mongo Express** | `mongo_express` | `8081`    | `8081`        | Web administration UI for MongoDB     |
+1. **İstek ve Kayıt:** İstemci, API Gateway üzerinden geçerek `auth-service` üzerindeki `/register` endpoint'ine istek atar.
+2. **Kullanıcı & Profil Oluşturma:** Auth servisi kullanıcıyı PostgreSQL veritabanına kaydeder ve ardından arka planda Feign Client aracılığıyla `customer` servisine bağlanarak bu kullanıcının detaylı müşteri profilini MongoDB üzerinde oluşturur.
+3. **Kafka Olayı Fırlatma:** Auth servisi işlemi tamamladıktan sonra Kafka'ya bir `UserRegisterEvent` mesajı gönderir.
+4. **Asenkron Mail Bildirimi:** `notification` servisi bu mesajı Kafka'dan asenkron olarak tüketir ve `EmailService` aracılığıyla kullanıcının adresine hoş geldin e-postası yollar.
 
 ---
 
-## 🚀 How to Run the Project
+## 🚀 Projeyi Çalıştırma
 
-### Prerequisites
-
-- Java 21 JDK or higher
-- Maven 3.x+
-- Node.js (v18+) and npm
-- Docker Desktop installed and running
-
-### Step 1: Start the Infrastructure Databases
-
-Navigate to the `services` directory and boot up the Docker containers:
-
+### Altyapıyı Başlatma
+Veritabanları ve mesaj kuyruğu (PostgreSQL, MongoDB, Kafka vb.) Docker üzerinde hazır hale getirilmiştir. Projeyi ayağa kaldırmadan önce altyapıyı başlatın:
 ```bash
 cd services
 docker-compose up -d
 ```
 
-### Step 2: Start Backend Services in Order
-
-Start the services in the following order to allow config mapping and discovery registration:
-
-1. **Config Server:**
-   ```bash
-   cd services/config-server
-   mvn spring-boot:run
-   ```
-2. **Discovery Service (Eureka):**
-   ```bash
-   cd services/discovery
-   mvn spring-boot:run
-   ```
-3. **Auth Service:**
-   ```bash
-   cd services/auth-service
-   mvn spring-boot:run
-   ```
-4. **Customer Service:**
-   ```bash
-   cd services/customer
-   mvn spring-boot:run
-   ```
-5. **API Gateway:**
-   ```bash
-   cd services/gateway
-   mvn spring-boot:run
-   ```
-
-Verify all running instances register successfully in the Eureka Dashboard at `http://localhost:8761`.
-
-### Step 3: Start the Angular Frontend
-
-Navigate to the `finance-ui` directory, install dependencies, and start the development server:
-
-```bash
-cd finance-ui
-npm install
-npm start
-```
-
-Access the UI panel in your browser at `http://localhost:4200`.
-
----
-
-## 🔒 Security & Configuration Details
-
-- **Spring Cloud Config Import:** All clients import configuration templates from `config-server` on port `8888` via:
-  ```yaml
-  spring:
-    config:
-      import: "optional:configserver:http://localhost:8888"
-  ```
-- **Stateless Security:** `auth-service` uses stateless session management with BCrypt password hashing and JWT token filtration. Gateway applies token verification filter globally on protected endpoints.
+### Servisleri Başlatma Sırası
+Servislerin doğru şekilde birbirine bağlanabilmesi için şu sırayla çalıştırılması önerilir:
+1. `config-server` (Yapılandırmaların okunabilmesi için en başta)
+2. `discovery` (Diğer servislerin kayıt olabilmesi için)
+3. `auth-service`, `customer`, `notification` (Çekirdek servisler)
+4. `gateway` (Geçit kapısı)
