@@ -14,18 +14,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Adım: Java 17 (veya senin sürümün neyse) ortamını kuruyoruz
+      # 2. Adım: Java 21 ortamını kuruyoruz (Burayı düzelttik!)
       - name: Set up JDK 21
-        uses: actions/environments/java@v4 # Not: Standart setup-java aksiyonudur
+        uses: actions/setup-java@v4
         with:
           java-version: "21"
           distribution: "temurin"
-          cache: maven # Maven bağımlılıklarını önbelleğe alır ki sonraki build'ler jet gibi hızlı olsun
+          cache: maven # Bağımlılıkları cache'ler, sonraki build'ler jet gibi hızlanır
 
-      # 3. Adım: Kodumuzu derliyoruz ve testleri koşuyoruz (Jar dosyasını basıyoruz)
+      # 3. Adım: Kodumuzu derliyoruz (Hepsini tek tek build eder)
       - name: Build with Maven
-        run: mvn clean package -DskipTests=false # İlk etapta testlerin varsa koşsun, patlarsa pipeline dursun diye false bıraktım
+        run: mvn clean package -DskipTests=false
 
-      # 4. Adım: Docker Compose dosyasının sözdizimi (syntax) doğru mu diye kontrol ediyoruz
+      # 4. Adım: Docker Compose dosyasının sözdizimi doğru mu diye kontrol ediyoruz
       - name: Check Docker Compose Config
         run: docker compose config
