@@ -8,6 +8,20 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    # İşte burası o meşhur Matrix! Robot bu listeyi alıp paralel evrenler açacak.
+    strategy:
+      matrix:
+        service:
+          [
+            "auth-service",
+            "config-server",
+            "customer",
+            "discovery",
+            "gateway",
+            "notification",
+            "wallet",
+          ]
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -20,12 +34,18 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      # auth-service klasörüne gidip orayı derliyoruz
-      - name: Build Auth Service
-        working-directory: ./services/auth-service
+      # Matrix sayesinde ${{ matrix.service }} yazarak dinamik olarak sırayla her klasöre giriyor
+      - name: Build ${{ matrix.service }}
+        working-directory: ./services/${{ matrix.service }}
         run: mvn clean package -DskipTests=true
 
-      # docker-compose.yml dosyasının olduğu klasöre gidip kontrol ediyoruz
+  # Docker compose kontrolünü ayrı bir iş olarak dışarı aldık ki servis derlemeleriyle çakışmasın
+  check-docker-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Check Docker Compose Config
         working-directory: ./services
         run: docker compose config
