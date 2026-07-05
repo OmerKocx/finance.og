@@ -2,9 +2,9 @@ spring:
   data:
     mongodb:
       username: glaymet
-      password: glaymet
-      host: localhost
-      port: 27017
+      password: ${MONGO_PASS}
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
       database: customer
       authentication-database: admin
 
@@ -14,4 +14,3 @@ server:
 springdoc:
   api-docs:
     path: /customers/v3/api-docs
-

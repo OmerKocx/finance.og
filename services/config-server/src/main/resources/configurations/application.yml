@@ -3,7 +3,7 @@ eureka:
     hostname: localhost
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_SERVER}
 name:
   value: glaymet
 spring:
@@ -22,7 +22,7 @@ management:
       probability: 1.0
   zipkin:
     tracing:
-      endpoint: http://localhost:9411/api/v2/spans
+      endpoint: ${ZIPKIN_SERVER}
 
 logging:
   pattern:

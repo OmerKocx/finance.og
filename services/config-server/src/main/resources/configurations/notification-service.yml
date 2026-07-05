@@ -4,7 +4,7 @@ server:
 # Kafka Ayarları
 spring:
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_SERVERS}
     consumer:
       group-id: notification-group-v2
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -16,8 +16,8 @@ spring:
   mail:
     host: smtp.gmail.com # Kullandığın SMTP sağlayıcı
     port: 587
-    username: 36omerkoc3634@gmail.com
-    password: tlefbrfjobkyohyt
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     # Gmail için Uygulama Şifresi
     properties:
       mail:
