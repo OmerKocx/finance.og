@@ -1,0 +1,68 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "ConfigServerApplication",
+      "request": "launch",
+      "mainClass": "com.omerkoc.config_server.ConfigServerApplication",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "DiscoveryApplication",
+      "request": "launch",
+      "mainClass": "com.omerkoc.discovery.DiscoveryApplication",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "AuthServiceApplication",
+      "request": "launch",
+      "mainClass": "com.omerkoc.auth_service.AuthServiceApplication",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "CustomerApplication",
+      "request": "launch",
+      "mainClass": "com.omerkoc.customer.CustomerApplication",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "NotificationApplication",
+      "request": "launch",
+      "mainClass": "com.omerkoc.notification.NotificationApplication",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "GatewayApplication",
+      "request": "launch",
+      "mainClass": "com.omerkoc.gateway.GatewayApplication",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "WalletApplication",
+      "request": "launch",
+      "mainClass": "com.omerkoc.wallet.WalletApplication",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "My Finance - Tüm Servisleri Başlat",
+      "configurations": [
+        "ConfigServerApplication",
+        "DiscoveryApplication",
+        "AuthServiceApplication",
+        "CustomerApplication",
+        "NotificationApplication",
+        "GatewayApplication",
+        "WalletApplication"
+      ]
+    }
+  ]
+}
