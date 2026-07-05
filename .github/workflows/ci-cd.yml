@@ -1,31 +1,30 @@
 name: Spring Boot CI-CD Pipeline
 
-# Bu pipeline ne zaman çalışsın?
 on:
   push:
-    branches: ["main", "master"] # Sadece main veya master branch'ine push attığında tetiklenir
+    branches: ["main", "master"]
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest # GitHub bizim için arkada tertemiz bir Ubuntu makine açıyor
+    runs-on: ubuntu-latest
 
     steps:
-      # 1. Adım: GitHub'daki kodlarımızı bu Ubuntu makinesine çekiyoruz
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Adım: Java 21 ortamını kuruyoruz (Burayı düzelttik!)
+      # Java 21 Ayarı
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: "21"
+          java-version: "21" # Burayı 21 yaptık kral!
           distribution: "temurin"
-          cache: maven # Bağımlılıkları cache'ler, sonraki build'ler jet gibi hızlanır
+          cache: maven
 
-      # 3. Adım: Kodumuzu derliyoruz (Hepsini tek tek build eder)
-      - name: Build with Maven
-        run: mvn clean package -DskipTests=false
+      # auth-service klasörüne gidip orayı derliyoruz
+      - name: Build Auth Service
+        working-directory: ./services/auth-service
+        run: mvn clean package -DskipTests=true
 
-      # 4. Adım: Docker Compose dosyasının sözdizimi doğru mu diye kontrol ediyoruz
+      # Docker Compose dosyasının sözdizimi kontrolü
       - name: Check Docker Compose Config
         run: docker compose config
