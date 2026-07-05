@@ -27,4 +27,4 @@ jobs:
 
       # Docker Compose dosyasının sözdizimi kontrolü
       - name: Check Docker Compose Config
-        run: docker compose config
+        run: docker compose -f ./docker-compose.yml config
