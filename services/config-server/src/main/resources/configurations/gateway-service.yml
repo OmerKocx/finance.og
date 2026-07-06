@@ -20,6 +20,14 @@ spring:
                 - Path=/customers/**
               filters:
                 - AuthenticationFilter
+
+            # Route for Wallet Service (Secured with JWT filter)
+            - id: wallet-service
+              uri: lb://wallet-service
+              predicates:
+                - Path=/wallets/**
+              filters:
+                - AuthenticationFilter
 management:
   endpoint:
     gateway:
@@ -47,3 +55,5 @@ springdoc:
         url: /auth/v3/api-docs
       - name: customer-service
         url: /customers/v3/api-docs
+      - name: wallet-service
+        url: /wallets/v3/api-docs

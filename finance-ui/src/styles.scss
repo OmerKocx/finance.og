@@ -4,26 +4,26 @@
   --font-primary: 'Plus Jakarta Sans', 'Inter', sans-serif;
   --font-secondary: 'Inter', sans-serif;
 
-  /* Colors: Humanized, premium dark mode palette (Zinc-based) */
-  --bg-dark: #09090b; /* Pitch dark neutral background */
-  --bg-card: #18181b; /* Solid zinc-900 panel background */
-  --bg-card-hover: #27272a; /* Solid zinc-800 hover state */
-  --border-glass: #27272a; /* Clean thin border (no artificial glowing borders) */
-  --border-glass-focus: #dc2626; /* Elegant red border highlight for focus states */
+  /* Colors: Humanized, premium light mode palette (Slate-based) */
+  --bg-dark: #f8fafc; /* Very light slate gray neutral background */
+  --bg-card: #ffffff; /* Pure white card background */
+  --bg-card-hover: #f1f5f9; /* Slate-100 hover state */
+  --border-glass: #e2e8f0; /* Thin border slate-200 */
+  --border-glass-focus: #2563eb; /* Elegant royal blue border highlight for focus states */
   
-  --primary: #9b111e; /* Orient Kamasu Dial Red (deep metallic ruby/wine) */
-  --primary-hover: #b91c1c; /* Illuminated red */
-  --primary-glow: rgba(155, 17, 30, 0.15);
+  --primary: #2563eb; /* Royal Blue */
+  --primary-hover: #1d4ed8; /* Active royal blue */
+  --primary-glow: rgba(37, 99, 235, 0.1);
   
-  --secondary: #18181b; 
-  --secondary-glow: rgba(0, 0, 0, 0.1);
+  --secondary: #f1f5f9; 
+  --secondary-glow: rgba(0, 0, 0, 0.05);
 
-  --accent-rose: #e11d48;
-  --accent-red: #c91c25;
+  --accent-rose: #3b82f6; /* Blue accent */
+  --accent-red: #2563eb;
   
-  --text-primary: #f4f4f5; /* Clean white-gray */
-  --text-secondary: #a1a1aa; /* Steel gray */
-  --text-muted: #71717a; /* Medium gray for captions */
+  --text-primary: #0f172a; /* Deep dark slate for headers */
+  --text-secondary: #475569; /* Slate secondary for general text */
+  --text-muted: #64748b; /* Cool gray for captions */
 
   --success: #10b981;
   --error: #ef4444;
@@ -57,12 +57,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.15);
 }
 
 /* Elegant Static Background */
@@ -76,8 +76,8 @@ body {
   overflow: hidden;
   background-color: var(--bg-dark);
   
-  /* Very subtle modern dark-red vignette for premium fintech aesthetics */
+  /* Very subtle modern light-blue vignette for premium fintech aesthetics */
   background-image: 
-    radial-gradient(circle at top right, rgba(155, 17, 30, 0.08), transparent 50%),
-    radial-gradient(circle at bottom left, rgba(24, 24, 27, 0.6), transparent 60%);
+    radial-gradient(circle at top right, rgba(37, 99, 235, 0.06), transparent 50%),
+    radial-gradient(circle at bottom left, rgba(241, 245, 249, 0.8), transparent 60%);
 }

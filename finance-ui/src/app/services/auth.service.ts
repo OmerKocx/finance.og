@@ -7,6 +7,7 @@ export interface AuthResponse {
   token: string;
   email: string;
   name: string;
+  userId: number;
 }
 
 // @Injectable: Bu sınıfın bir "servis" olduğunu ve tüm uygulamada istenen her yerden enjekte edilerek (kullanılarak) paylaşılabileceğini belirtir.
@@ -41,6 +42,7 @@ export class AuthService {
     localStorage.setItem('auth_token', authData.token);
     localStorage.setItem('auth_email', authData.email);
     localStorage.setItem('auth_name', authData.name || '');
+    localStorage.setItem('auth_user_id', authData.userId ? authData.userId.toString() : '');
   }
 
   // getToken: Tarayıcı hafızasındaki JWT Token'ı okur.
@@ -58,11 +60,18 @@ export class AuthService {
     return localStorage.getItem('auth_name');
   }
 
+  // getUserId: Tarayıcı hafızasındaki giriş yapmış kullanıcının ID'sini okur.
+  getUserId(): number | null {
+    const id = localStorage.getItem('auth_user_id');
+    return id ? parseInt(id, 10) : null;
+  }
+
   // clearSession: Kullanıcı çıkış yaptığında tarayıcı hafızasındaki bilgileri siler.
   clearSession(): void {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_email');
     localStorage.removeItem('auth_name');
+    localStorage.removeItem('auth_user_id');
   }
 
   // isLoggedIn: Kullanıcının oturum açıp açmadığını, token değerinin varlığına bakarak kontrol eder.

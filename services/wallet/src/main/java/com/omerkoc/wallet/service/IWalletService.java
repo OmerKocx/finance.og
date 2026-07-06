@@ -3,6 +3,7 @@ package com.omerkoc.wallet.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import com.omerkoc.wallet.dto.TransactionResponseDto;
+import com.omerkoc.wallet.dto.WalletRequestDto;
 import com.omerkoc.wallet.dto.WalletResponseDto;
 
 public interface IWalletService {
@@ -11,11 +12,11 @@ public interface IWalletService {
 
     WalletResponseDto getWalletByUserId(Long userId);
 
-    WalletResponseDto createWallet(Long userId);
+    WalletResponseDto createWallet(WalletRequestDto walletRequestDto);
 
-    WalletResponseDto updateWallet(Long userId, WalletResponseDto walletResponseDto);
+    WalletResponseDto updateWallet(WalletRequestDto walletRequestDto);
 
-    void deleteWallet(Long userId);
+    void deleteWallet(Long walletId);
 
     Page<WalletResponseDto> getAllWallets(Pageable pageable);
 
@@ -29,7 +30,8 @@ public interface IWalletService {
 
     Page<TransactionResponseDto> getTransactionHistory(Long walletId, Pageable pageable);
 
-    Page<TransactionResponseDto> getTransactionHistoryByDate(Long walletId, String startDate, String endDate, Pageable pageable);
+    Page<TransactionResponseDto> getTransactionHistoryByDate(Long walletId, String startDate, String endDate,
+            Pageable pageable);
 
     Page<TransactionResponseDto> getTransactionHistoryByType(Long walletId, String type, Pageable pageable);
 }

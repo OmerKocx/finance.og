@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.omerkoc.wallet.controller.IWalletController;
 import com.omerkoc.wallet.dto.TransactionResponseDto;
+import com.omerkoc.wallet.dto.WalletRequestDto;
 import com.omerkoc.wallet.dto.WalletResponseDto;
 import com.omerkoc.wallet.service.IWalletService;
 
@@ -41,23 +42,22 @@ public class WalletControllerImpl implements IWalletController {
     }
 
     @Override
-    @PostMapping("/create/{userId}")
-    public ResponseEntity<WalletResponseDto> createWallet(@Valid @PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(walletService.createWallet(userId));
+    @PostMapping("/create")
+    public ResponseEntity<WalletResponseDto> createWallet(@Valid @RequestBody WalletRequestDto walletRequestDto) {
+        return ResponseEntity.ok(walletService.createWallet(walletRequestDto));
     }
 
     @Override
-    @PutMapping("/update/{userId}")
-    public ResponseEntity<WalletResponseDto> updateWallet(@Valid @PathVariable("userId") Long userId,
-            @Valid @RequestBody WalletResponseDto walletResponseDto) {
-        return ResponseEntity.ok(walletService.updateWallet(userId, walletResponseDto));
+    @PutMapping("/update")
+    public ResponseEntity<WalletResponseDto> updateWallet(@Valid @RequestBody WalletRequestDto walletRequestDto) {
+        return ResponseEntity.ok(walletService.updateWallet(walletRequestDto));
     }
 
     @Override
-    @DeleteMapping("/delete/{userId}")
-    public ResponseEntity<Void> deleteWallet(@Valid @PathVariable("userId") Long userId) {
-        walletService.deleteWallet(userId);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteWallet(@Valid @PathVariable("id") Long id) {
+        walletService.deleteWallet(id);
+        return ResponseEntity.ok().build();
     }
 
     @Override

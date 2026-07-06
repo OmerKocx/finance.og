@@ -1,5 +1,5 @@
 import { Component, signal, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 
@@ -16,7 +16,7 @@ interface Transaction {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [DecimalPipe], // HTML içinde sayı biçimlendirme (number pipe) kullanabilmek için DecimalPipe ekliyoruz
+  imports: [DecimalPipe, RouterLink], // HTML içinde sayı biçimlendirme (number pipe) kullanabilmek için DecimalPipe ekliyoruz
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })

@@ -13,7 +13,6 @@ public class WalletMapper {
         return Wallet.builder()
                 .userId(walletRequestDto.userId())
                 .balance(walletRequestDto.balance())
-                .customerId(walletRequestDto.customerId())
                 .currency(walletRequestDto.currency())
                 .status(walletRequestDto.status())
                 .build();
@@ -24,7 +23,6 @@ public class WalletMapper {
                 .id(wallet.getId())
                 .userId(wallet.getUserId())
                 .balance(wallet.getBalance())
-                .customerId(wallet.getCustomerId())
                 .currency(wallet.getCurrency())
                 .status(wallet.getStatus())
                 .createdDate(wallet.getCreatedDate())

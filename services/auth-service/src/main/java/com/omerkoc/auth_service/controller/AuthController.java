@@ -99,6 +99,7 @@ public class AuthController {
                 .token(token)
                 .email(user.getEmail())
                 .name(request.getFullName())
+                .userId(user.getId())
                 .build());
     }
 
@@ -140,11 +141,13 @@ public class AuthController {
         // Kafka'ya Giriş Event'i gönder
         kafkaProducerService.sendLoginEvent(new UserLoginEvent(userDetails.getUsername()));
 
+        User user = (User) userDetails;
         // 5. Token, kullanıcının e-posta adresini ve adını içeren yanıtı dönüyoruz
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(token)
                 .email(userDetails.getUsername())
                 .name(name)
+                .userId(user.getId())
                 .build());
     }
 

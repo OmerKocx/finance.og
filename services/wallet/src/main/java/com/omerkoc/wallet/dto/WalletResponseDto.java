@@ -9,12 +9,11 @@ import lombok.Builder;
 
 @Builder
 public record WalletResponseDto(
-        Long id,
-        Long userId,
-        double balance,
-        Long customerId,
-        Currency currency,
-        Status status,
-        LocalDateTime createdDate,
-        LocalDateTime updatedDate) {
+                Long id,
+                Long userId,
+                double balance,
+                Currency currency,
+                Status status,
+                LocalDateTime createdDate,
+                LocalDateTime updatedDate) {
 }

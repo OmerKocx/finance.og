@@ -146,7 +146,7 @@
 
   input {
     width: 100%;
-    background: #09090b;
+    background: var(--bg-dark);
     border: 1px solid var(--border-glass);
     border-radius: 8px;
     padding: 10px 14px 10px 40px;
@@ -161,7 +161,7 @@
 
     &:focus {
       border-color: var(--border-glass-focus);
-      box-shadow: 0 0 0 2px rgba(155, 17, 30, 0.12);
+      box-shadow: 0 0 0 2px var(--primary-glow);
       
       ~ .input-icon {
         color: var(--text-primary);
@@ -285,7 +285,7 @@
     left: 0;
     height: 16px;
     width: 16px;
-    background-color: #09090b;
+    background-color: var(--bg-dark);
     border: 1px solid var(--border-glass);
     border-radius: 4px;
     transition: all 0.15s ease;

@@ -27,16 +27,16 @@ public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    // Customer Id
     private Long userId;
     private double balance;
-    private Long customerId;
-    
+
     @Enumerated(EnumType.STRING)
     private Currency currency;
-    
+
     @Enumerated(EnumType.STRING)
     private Status status;
-    
+
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 }

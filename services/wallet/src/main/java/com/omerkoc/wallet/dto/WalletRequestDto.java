@@ -9,13 +9,11 @@ import lombok.Builder;
 
 @Builder
 public record WalletRequestDto(
-        @NotNull(message = "User ID cannot be null") Long userId,
+                @NotNull(message = "User ID cannot be null") Long userId,
 
-        @PositiveOrZero(message = "Initial balance must be zero or positive") double balance,
+                @PositiveOrZero(message = "Initial balance must be zero or positive") double balance,
 
-        @NotNull(message = "Customer ID cannot be null") Long customerId,
+                @NotNull(message = "Currency cannot be null") Currency currency,
 
-        @NotNull(message = "Currency cannot be null") Currency currency,
-
-        @NotNull(message = "Wallet status cannot be null") Status status) {
+                @NotNull(message = "Wallet status cannot be null") Status status) {
 }
