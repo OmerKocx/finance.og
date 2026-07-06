@@ -13,6 +13,7 @@ target/
 .idea/
 *.iml
 .vscode/
+!.vscode/launch.json
 *.suo
 *.ntvs*
 *.njsproj
