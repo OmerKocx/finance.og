@@ -36,9 +36,17 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/validate",
                                 "/auth/validate-token",
-                                "/auth/v3/api-docs",
-                                "/auth/v3/api-docs"
-                        }
+                                "/auth/v3/api-docs/**",
+                                "/auth/swagger-ui/**",
+                                "/auth/swagger-ui.html")
+                        .permitAll()
+                        .anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -48,7 +56,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
         return config.getAuthenticationManager();
     }
 
