@@ -101,11 +101,11 @@ Projeyi ayağa kaldırmadan önce aşağıdaki çevre değişkenlerinin (Environ
 | :--- | :--- | :--- |
 | `AUTH_DB_URL` | Auth veritabanı JDBC adresi | `jdbc:postgresql://localhost:5444/user` |
 | `WALLET_DB_URL` | Cüzdan veritabanı JDBC adresi | `jdbc:postgresql://localhost:5444/user` |
-| `DB_USERNAME` | PostgreSQL kullanıcı adı | `postgres` |
-| `DB_PASSWORD` | PostgreSQL şifresi | `admin` |
+| `DB_USERNAME` | PostgreSQL kullanıcı adı (Docker varsayılanı) | `postgres` |
+| `DB_PASSWORD` | PostgreSQL şifresi (Docker varsayılanı) | `admin` |
 | `MONGO_HOST` | MongoDB adresi | `localhost` |
-| `MONGO_USER` | MongoDB kullanıcı adı | `glaymet` |
-| `MONGO_PASS` | MongoDB şifresi | `glaymet` |
+| `MONGO_USER` | MongoDB kullanıcı adı (Docker varsayılanı) | `glaymet` |
+| `MONGO_PASS` | MongoDB şifresi (Docker varsayılanı) | `glaymet` |
 | `JWT_SECRET_KEY` | JWT İmza anahtarı (Güvenli karakter dizisi) | `LupHyt72hUvCWSoxznpeN5D96l2npsa0tzVU1rXcUwd` |
 | `KAFKA_SERVERS` | Kafka broker adresi | `localhost:9092` |
 | `EUREKA_SERVER` | Eureka Keşif Sunucusu adresi | `http://localhost:8761/eureka` |
