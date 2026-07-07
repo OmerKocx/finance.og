@@ -46,11 +46,7 @@ export class WalletComponent implements OnInit {
   readonly transferAmount = signal<number | null>(null);
   readonly transferDestId = signal<number | null>(null);
 
-  // Local/Mock Transactions (dynamically added to during this session)
-  readonly transactions = signal<LocalTransaction[]>([
-    { id: 'TX-9021', title: 'İlk Cüzdan Açılış Bonusu', amount: 100.00, type: 'deposit', date: 'Bugün', status: 'SUCCESS' },
-    { id: 'TX-7643', title: 'Market Gideri (Mock)', amount: 120.50, type: 'withdraw', date: 'Dün', status: 'SUCCESS' }
-  ]);
+  readonly transactions = signal<LocalTransaction[]>([]);
 
   ngOnInit(): void {
     if (!this.userId) {
@@ -68,6 +64,7 @@ export class WalletComponent implements OnInit {
     this.walletService.getWalletByUserId(this.userId).subscribe({
       next: (res) => {
         this.wallet.set(res);
+        this.loadTransactionHistory(res.id);
         this.loading.set(false);
       },
       error: (err) => {
@@ -82,16 +79,51 @@ export class WalletComponent implements OnInit {
     });
   }
 
+  loadTransactionHistory(walletId: number): void {
+    this.walletService.getTransactionHistory(walletId, 0, 50).subscribe({
+      next: (page) => {
+        const mapped = (page.content || []).map((tx: any) => ({
+          id: 'TX-' + tx.id,
+          title: tx.description,
+          amount: tx.amount,
+          type: tx.type.toLowerCase() as LocalTransaction['type'],
+          date: this.formatDate(tx.createdDate),
+          status: 'SUCCESS' as const
+        }));
+        this.transactions.set(mapped);
+      },
+      error: (err) => {
+        console.error('Failed to load transaction history', err);
+      }
+    });
+  }
+
+  private formatDate(dateStr: string): string {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('tr-TR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
   initializeWallet(currency: 'TRY' | 'USD' | 'EUR'): void {
     if (!this.userId) return;
     this.loading.set(true);
     this.error.set('');
 
-    this.walletService.createWallet(this.userId, 100, currency).subscribe({
+    this.walletService.createWallet(this.userId, 0, currency).subscribe({
       next: (res) => {
         this.wallet.set(res);
         this.loading.set(false);
-        this.success.set('Cüzdanınız başarıyla oluşturuldu ve 100 birim hoş geldin hediyesi tanımlandı!');
+        this.success.set('Cüzdanınız başarıyla oluşturuldu!');
+        this.transactions.set([]); // empty history initially
         this.clearMessagesAfterDelay();
       },
       error: (err) => {
@@ -132,8 +164,8 @@ export class WalletComponent implements OnInit {
         this.isActionLoading.set(false);
         this.success.set(`${amount} ${w.currency} başarıyla yatırıldı.`);
         
-        // Add to local history
-        this.addLocalTransaction('Para Yatırma', amount, 'deposit');
+        // Refresh transaction history
+        this.loadTransactionHistory(w.id);
 
         setTimeout(() => this.closeModal(), 1500);
         this.clearMessagesAfterDelay();
@@ -167,8 +199,8 @@ export class WalletComponent implements OnInit {
         this.isActionLoading.set(false);
         this.success.set(`${amount} ${w.currency} başarıyla çekildi.`);
 
-        // Add to local history
-        this.addLocalTransaction('Para Çekme', amount, 'withdraw');
+        // Refresh transaction history
+        this.loadTransactionHistory(w.id);
 
         setTimeout(() => this.closeModal(), 1500);
         this.clearMessagesAfterDelay();
@@ -213,8 +245,8 @@ export class WalletComponent implements OnInit {
         this.isActionLoading.set(false);
         this.success.set(`${amount} ${w.currency} başarıyla Cüzdan ID: ${destId} hesabına gönderildi.`);
 
-        // Add to local history
-        this.addLocalTransaction(`Gönderilen Havale (ID: ${destId})`, amount, 'transfer_out');
+        // Refresh transaction history
+        this.loadTransactionHistory(w.id);
 
         setTimeout(() => this.closeModal(), 1500);
         this.clearMessagesAfterDelay();
@@ -224,18 +256,6 @@ export class WalletComponent implements OnInit {
         this.isActionLoading.set(false);
       }
     });
-  }
-
-  private addLocalTransaction(title: string, amount: number, type: LocalTransaction['type']): void {
-    const newTx: LocalTransaction = {
-      id: 'TX-' + Math.floor(1000 + Math.random() * 9000),
-      title,
-      amount,
-      type,
-      date: 'Şimdi',
-      status: 'SUCCESS'
-    };
-    this.transactions.update(list => [newTx, ...list]);
   }
 
   private clearMessagesAfterDelay(): void {

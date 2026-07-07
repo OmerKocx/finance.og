@@ -3,11 +3,22 @@ package com.omerkoc.wallet.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.omerkoc.wallet.model.Wallet;
 
+import feign.Param;
+import jakarta.persistence.LockModeType;
+
 @Repository
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
     Optional<Wallet> findByUserId(Long userId);
+
+    // ANLIK VERİYİ KİLİTLER. HATTA TABLOYU KİTLER RACE CONDİTİON OLUŞMASINI
+    // ENGELLER
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT w FROM Wallet w WHERE w.id = :id")
+    Optional<Wallet> findByIdForUpdate(@Param("id") Long id);
 }

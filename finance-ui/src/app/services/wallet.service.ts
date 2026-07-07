@@ -59,4 +59,8 @@ export class WalletService {
       this.getAuthHeaders()
     );
   }
+
+  getTransactionHistory(walletId: number, page: number = 0, size: number = 20): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${walletId}/history?page=${page}&size=${size}`, this.getAuthHeaders());
+  }
 }

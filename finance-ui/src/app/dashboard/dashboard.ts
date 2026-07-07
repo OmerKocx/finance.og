@@ -1,7 +1,8 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { AuthService } from '../services/auth.service';
+import { WalletService } from '../services/wallet.service';
 
 // Transaction: İşlem listesi için kullanılan veri yapısı model tanımı.
 interface Transaction {
@@ -20,11 +21,13 @@ interface Transaction {
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   // Yönlendirme ve veri oturumu işlemleri için ilgili bağımlılıkları enjekte ediyoruz
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly walletService = inject(WalletService);
 
+  readonly userId = this.authService.getUserId();
   // Oturum açmış kullanıcının adı ve baş harfleri
   readonly userName = signal(this.authService.getName() || 'Kullanıcı');
   readonly userInitials = computed(() => {
@@ -38,20 +41,91 @@ export class DashboardComponent {
   });
 
   // Finansal özet istatistiklerini tutan sinyaller (Signals)
-  readonly balance = signal(14250.75); // Toplam bakiye değeri
-  readonly income = signal(5800.00); // Gelir değeri
-  readonly expenses = signal(1549.25); // Gider değeri
+  readonly balance = signal(0.00); // Toplam bakiye değeri
+  readonly income = signal(0.00); // Gelir değeri
+  readonly expenses = signal(0.00); // Gider değeri
   readonly currency = signal('₺'); // Para birimi simgesi
 
-  // transactions: Arayüzde listelenecek mockup (yapay) son işlemler verisini tutan dizi sinyali.
-  readonly transactions = signal<Transaction[]>([
-    { id: '1', title: 'Aylık Maaş Yatırımı', category: 'Gelir', amount: 5000.00, type: 'income', date: 'Bugün' },
-    { id: '2', title: 'Market Alışverişi', category: 'Mutfak', amount: 345.50, type: 'expense', date: 'Dün' },
-    { id: '3', title: 'Elektrik Faturası', category: 'Faturalar', amount: 480.00, type: 'expense', date: '29 Haz' },
-    { id: '4', title: 'Freelance Tasarım Projesi', category: 'Gelir', amount: 800.00, type: 'income', date: '28 Haz' },
-    { id: '5', title: 'Kahve & Atıştırmalık', category: 'Sosyal', amount: 75.00, type: 'expense', date: '27 Haz' },
-    { id: '6', title: 'Dijital Platform Üyeliği', category: 'Eğlence', amount: 149.99, type: 'expense', date: '25 Haz' }
-  ]);
+  // transactions: Arayüzde listelenecek son işlemler verisini tutan dizi sinyali.
+  readonly transactions = signal<Transaction[]>([]);
+
+  ngOnInit(): void {
+    if (!this.userId) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    this.loadDashboardData();
+  }
+
+  private loadDashboardData(): void {
+    this.walletService.getWalletByUserId(this.userId!).subscribe({
+      next: (wallet) => {
+        this.balance.set(wallet.balance);
+        this.currency.set(this.getCurrencySymbol(wallet.currency));
+        this.loadTransactions(wallet.id);
+      },
+      error: (err) => {
+        console.error('Failed to load wallet on dashboard', err);
+        // Cüzdan henüz oluşturulmamışsa varsayılan olarak bakiye 0.00 gösterilir
+      }
+    });
+  }
+
+  private loadTransactions(walletId: number): void {
+    this.walletService.getTransactionHistory(walletId, 0, 10).subscribe({
+      next: (page) => {
+        const mapped: Transaction[] = (page.content || []).map((tx: any) => ({
+          id: tx.id.toString(),
+          title: tx.description,
+          category: this.getCategoryLabel(tx.type),
+          amount: tx.amount,
+          type: (tx.type === 'DEPOSIT' || tx.type === 'TRANSFER_IN') ? 'income' : 'expense',
+          date: this.formatDate(tx.createdDate)
+        }));
+        this.transactions.set(mapped);
+
+        // Son 10 işlemden gelir ve gider toplamlarını hesapla
+        const inc = mapped.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+        const exp = mapped.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        this.income.set(inc);
+        this.expenses.set(exp);
+      },
+      error: (err) => {
+        console.error('Failed to load dashboard transactions', err);
+      }
+    });
+  }
+
+  private getCurrencySymbol(code: string): string {
+    switch (code) {
+      case 'TRY': return '₺';
+      case 'USD': return '$';
+      case 'EUR': return '€';
+      default: return '₺';
+    }
+  }
+
+  private getCategoryLabel(type: string): string {
+    switch (type) {
+      case 'DEPOSIT': return 'Para Yatırma';
+      case 'WITHDRAW': return 'Para Çekme';
+      case 'TRANSFER_IN': return 'Gelen Havale';
+      case 'TRANSFER_OUT': return 'Giden Havale';
+      default: return 'Cüzdan Hareketi';
+    }
+  }
+
+  private formatDate(dateStr: string): string {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('tr-TR', {
+        day: '2-digit',
+        month: 'short'
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  }
 
   // logout: Kullanıcının oturum bilgilerini siler ve giriş sayfasına yönlendirir.
   logout(): void {
