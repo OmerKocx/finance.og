@@ -106,7 +106,7 @@ Projeyi ayağa kaldırmadan önce aşağıdaki çevre değişkenlerinin (Environ
 | `MONGO_HOST` | MongoDB adresi | `localhost` |
 | `MONGO_USER` | MongoDB kullanıcı adı | `your-mongodb-username` |
 | `MONGO_PASS` | MongoDB şifresi | `your-mongodb-password` |
-| `JWT_SECRET_KEY` | JWT İmza anahtarı (Güvenli karakter dizisi) | `LupHyt72hUvCWSoxznpeN5D96l2npsa0tzVU1rXcUwd` |
+| `JWT_SECRET_KEY` | JWT İmza anahtarı (Güvenli karakter dizisi) | `your-jwt-secret-key` |
 | `KAFKA_SERVERS` | Kafka broker adresi | `localhost:9092` |
 | `EUREKA_SERVER` | Eureka Keşif Sunucusu adresi | `http://localhost:8761/eureka` |
 | `ZIPKIN_SERVER` | Dağıtık izleme sunucusu adresi | `http://localhost:9411/api/v2/spans` |
