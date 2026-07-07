@@ -11,39 +11,39 @@ Sistem; istemci (Angular UI) isteklerinin tek bir API Geçidinden (Gateway) geç
 ```mermaid
 graph TD
     %% İstemci ve Gateway
-    UI[Finance UI (Angular)] -->|API İstekleri| GW[API Gateway]
+    UI["Finance UI (Angular)"] -->|"API İstekleri"| GW[API Gateway]
 
     %% Altyapı Servisleri
-    CS[Config Server] -->|Merkezi Yapılandırma| GW
-    CS -->|Merkezi Yapılandırma| AS[Auth Service]
-    CS -->|Merkezi Yapılandırma| CUST[Customer Service]
-    CS -->|Merkezi Yapılandırma| WALLET[Wallet Service]
-    CS -->|Merkezi Yapılandırma| NOTIF[Notification Service]
+    CS[Config Server] -->|"Merkezi Yapılandırma"| GW
+    CS -->|"Merkezi Yapılandırma"| AS[Auth Service]
+    CS -->|"Merkezi Yapılandırma"| CUST[Customer Service]
+    CS -->|"Merkezi Yapılandırma"| WALLET[Wallet Service]
+    CS -->|"Merkezi Yapılandırma"| NOTIF[Notification Service]
     
-    DS[Discovery Registry] <-->|Dinamik Kayıt & Keşif| GW
-    DS <-->|Dinamik Kayıt & Keşif| AS
-    DS <-->|Dinamik Kayıt & Keşif| CUST
-    DS <-->|Dinamik Kayıt & Keşif| WALLET
-    DS <-->|Dinamik Kayıt & Keşif| NOTIF
+    DS[Discovery Registry] <-->|"Dinamik Kayıt & Keşif"| GW
+    DS <-->|"Dinamik Kayıt & Keşif"| AS
+    DS <-->|"Dinamik Kayıt & Keşif"| CUST
+    DS <-->|"Dinamik Kayıt & Keşif"| WALLET
+    DS <-->|"Dinamik Kayıt & Keşif"| NOTIF
 
     %% Gateway Yönlendirmeleri
-    GW -->|/auth/**| AS
-    GW -->|/customers/**| CUST
-    GW -->|/wallets/**| WALLET
+    GW -->|"/auth/**"| AS
+    GW -->|"/customers/**"| CUST
+    GW -->|"/wallets/**"| WALLET
 
     %% Servislerin Veritabanları ve Dış Dünya
-    AS -->|Kullanıcı Bilgileri| DB_PG[(PostgreSQL)]
-    CUST -->|Müşteri Profilleri| DB_MONGO[(MongoDB)]
-    WALLET -->|Cüzdanlar & Transferler| DB_PG[(PostgreSQL)]
-    WALLET -.->|Scheduled Task| EXT_API[Dış Döviz Kurları API]
+    AS -->|"Kullanıcı Bilgileri"| DB_PG[(PostgreSQL)]
+    CUST -->|"Müşteri Profilleri"| DB_MONGO[(MongoDB)]
+    WALLET -->|"Cüzdanlar & Transferler"| DB_PG[(PostgreSQL)]
+    WALLET -.->|"Scheduled Task"| EXT_API["Dış Döviz Kurları API"]
 
     %% Feign İletişimi
-    AS -.->|Feign Client: Müşteri Profilini Aç| CUST
+    AS -.->|"Feign Client: Müşteri Profilini Aç"| CUST
 
     %% Asenkron Olay Akışı (Kafka)
-    AS -->|Kayıt/Giriş Eventleri| KAFKA{{Kafka Broker}}
-    KAFKA -->|Mesaj Tüketimi| NOTIF
-    NOTIF -->|SMTP Protokolü| MAIL[Gmail SMTP Server]
+    AS -->|"Kayıt/Giriş Eventleri"| KAFKA{{Kafka Broker}}
+    KAFKA -->|"Mesaj Tüketimi"| NOTIF
+    NOTIF -->|"SMTP Protokolü"| MAIL[Gmail SMTP Server]
 ```
 
 ---
