@@ -12,7 +12,7 @@
 	<artifactId>gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>gateway</name>
-	<description>API Gateway for My Finance project</description>
+	<description>API Gateway for Finance.org project</description>
 	<properties>
 		<java.version>21</java.version>
 		<spring-cloud.version>2025.1.2</spring-cloud.version>

@@ -1,4 +1,4 @@
-# My Finance - Microservices Project
+# Finance.org - Microservices Project
 
 This project is a scalable, modern financial management platform built using Java 21, Spring Boot, Spring Cloud, Kafka, Angular, and Docker. The system encapsulates end-to-end financial workflows in compliance with microservices standards, including user registration and login (JWT-based), profile management, multi-currency wallet creation (TRY/USD/EUR), real-time peer-to-peer transfers with live exchange rate conversions, deposits/withdrawals, and paginated transaction history tracking.
 
