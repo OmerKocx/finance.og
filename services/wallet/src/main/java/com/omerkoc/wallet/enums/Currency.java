@@ -1,7 +1,7 @@
 package com.omerkoc.wallet.enums;
 
 public enum Currency {
-    TL("TRY"),
+    TRY("TRY"),
     USD("USD"),
     EUR("EUR");
 

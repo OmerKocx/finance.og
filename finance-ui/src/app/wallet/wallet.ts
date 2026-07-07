@@ -127,7 +127,7 @@ export class WalletComponent implements OnInit {
         this.clearMessagesAfterDelay();
       },
       error: (err) => {
-        this.error.set('Cüzdan oluşturulurken bir hata oluştu.');
+        this.error.set(this.getErrorMessage(err) || 'Cüzdan oluşturulurken bir hata oluştu.');
         this.loading.set(false);
       }
     });
@@ -171,7 +171,7 @@ export class WalletComponent implements OnInit {
         this.clearMessagesAfterDelay();
       },
       error: (err) => {
-        this.error.set('Yatırma işlemi gerçekleştirilemedi.');
+        this.error.set(this.getErrorMessage(err) || 'Yatırma işlemi gerçekleştirilemedi.');
         this.isActionLoading.set(false);
       }
     });
@@ -206,7 +206,7 @@ export class WalletComponent implements OnInit {
         this.clearMessagesAfterDelay();
       },
       error: (err) => {
-        this.error.set(err.error?.message || 'Çekme işlemi gerçekleştirilemedi.');
+        this.error.set(this.getErrorMessage(err) || 'Çekme işlemi gerçekleştirilemedi.');
         this.isActionLoading.set(false);
       }
     });
@@ -252,7 +252,7 @@ export class WalletComponent implements OnInit {
         this.clearMessagesAfterDelay();
       },
       error: (err) => {
-        this.error.set(err.error?.message || 'Transfer gerçekleştirilemedi. Alıcı cüzdan ID geçerli olmayabilir.');
+        this.error.set(this.getErrorMessage(err) || 'Transfer gerçekleştirilemedi. Alıcı cüzdan ID geçerli olmayabilir.');
         this.isActionLoading.set(false);
       }
     });
@@ -268,5 +268,66 @@ export class WalletComponent implements OnInit {
   logout(): void {
     this.authService.clearSession();
     this.router.navigate(['/login']);
+  }
+
+  // getErrorMessage: Sunucu hatalarını son kullanıcıya yönelik şık ve anlaşılır mesajlara dönüştürür.
+  private getErrorMessage(err: any): string {
+    if (!err) return '';
+    
+    let rawMessage = '';
+    const errorBody = err.error;
+    if (errorBody) {
+      if (typeof errorBody === 'string') {
+        rawMessage = errorBody;
+      } else if (errorBody.errors && errorBody.errors.message) {
+        rawMessage = errorBody.errors.message;
+      } else if (errorBody.message) {
+        rawMessage = errorBody.message;
+      }
+    }
+    
+    if (!rawMessage && err.message) {
+      rawMessage = err.message;
+    }
+    
+    if (!rawMessage) {
+      return 'Beklenmedik bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+    }
+
+    const lowerMsg = rawMessage.toLowerCase();
+    
+    // Sunucu kapalı veya internet yok (Status 0 veya Failed to fetch)
+    if (err.status === 0 || lowerMsg.includes('failed to fetch') || lowerMsg.includes('unknown error')) {
+      return 'Sunucuyla bağlantı kurulamadı. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.';
+    }
+    
+    // Mükerrer / Zaten kayıtlı bilgileri
+    if (lowerMsg.includes('duplicate key') || lowerMsg.includes('incorrectresultsizedataaccessexception') || lowerMsg.includes('already exists')) {
+      return 'Bu işlem gerçekleştirilemedi, girdiğiniz benzersiz bilgiler sistemde zaten mevcut.';
+    }
+    
+    // Yetki hataları
+    if (lowerMsg.includes('bad credentials') || lowerMsg.includes('unauthorized') || lowerMsg.includes('401')) {
+      return 'Bu işlemi gerçekleştirmek için yetkiniz bulunmamaktadır.';
+    }
+    
+    // Veritabanı ve diğer genel 500 sunucu hataları
+    if (
+      lowerMsg.includes('relation') || 
+      lowerMsg.includes('does not exist') || 
+      lowerMsg.includes('sql') || 
+      lowerMsg.includes('jdbc') || 
+      lowerMsg.includes('query') || 
+      lowerMsg.includes('hibernate') || 
+      lowerMsg.includes('mongo') || 
+      lowerMsg.includes('psqlexception') || 
+      lowerMsg.includes('feignexception') || 
+      lowerMsg.includes('internal server error') || 
+      err.status === 500
+    ) {
+      return 'İşleminiz gerçekleştirilirken geçici bir sistem hatası oluştu. Lütfen daha sonra tekrar deneyin.';
+    }
+
+    return rawMessage;
   }
 }

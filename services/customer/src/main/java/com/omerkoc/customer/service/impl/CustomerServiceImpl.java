@@ -29,7 +29,7 @@ public class CustomerServiceImpl implements ICustomerService {
     public CustomerResponseDto createCustomer(CustomerRequestDto customerRequestDto) {
         log.info("Creating customer with email: {} and name: {}", customerRequestDto.email(),
                 customerRequestDto.name());
-        if (customerRepository.findByEmail(customerRequestDto.email()).isPresent()) {
+        if (customerRepository.findFirstByEmail(customerRequestDto.email()).isPresent()) {
             throw new CustomerAlreadyExistsException(
                     "Customer already exists with email: " + customerRequestDto.email());
         }
@@ -59,7 +59,7 @@ public class CustomerServiceImpl implements ICustomerService {
 
     @Override
     public CustomerResponseDto getCustomerByEmail(String email) {
-        Customer customer = customerRepository.findByEmail(email)
+        Customer customer = customerRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with email: " + email));
         return customerMapper.toCustomerResponseDto(customer);
     }

@@ -177,27 +177,71 @@ export class AuthComponent {
     });
   }
 
-  // getErrorMessage: Backend'den dönen nested veya düz hata mesajlarını akıllıca parse eder.
+  // getErrorMessage: Sunucu hatalarını son kullanıcıya yönelik şık ve anlaşılır mesajlara dönüştürür.
   private getErrorMessage(err: any): string {
     if (!err) return '';
+    
+    let rawMessage = '';
     const errorBody = err.error;
     if (errorBody) {
       if (typeof errorBody === 'string') {
-        return errorBody;
-      }
-      // GlobalExceptionHandler'dan dönen ErrorResponse (errors: { message: "..." })
-      if (errorBody.errors && errorBody.errors.message) {
-        return errorBody.errors.message;
-      }
-      // Standart Spring Boot veya diğer hata gövdeleri (message: "...")
-      if (errorBody.message) {
-        return errorBody.message;
+        rawMessage = errorBody;
+      } else if (errorBody.errors && errorBody.errors.message) {
+        rawMessage = errorBody.errors.message;
+      } else if (errorBody.message) {
+        rawMessage = errorBody.message;
       }
     }
-    if (err.message) {
-      return err.message;
+    
+    if (!rawMessage && err.message) {
+      rawMessage = err.message;
     }
-    return '';
+    
+    if (!rawMessage) {
+      return 'Beklenmedik bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+    }
+
+    const lowerMsg = rawMessage.toLowerCase();
+    
+    // Sunucu kapalı veya internet yok (Status 0 veya Failed to fetch)
+    if (err.status === 0 || lowerMsg.includes('failed to fetch') || lowerMsg.includes('unknown error')) {
+      return 'Sunucuyla bağlantı kurulamadı. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.';
+    }
+    
+    // Mükerrer / Zaten kayıtlı bilgileri
+    if (lowerMsg.includes('duplicate key') || lowerMsg.includes('incorrectresultsizedataaccessexception') || lowerMsg.includes('already exists')) {
+      if (lowerMsg.includes('email') || lowerMsg.includes('customer')) {
+        return 'Bu e-posta adresi ile kayıtlı bir hesap zaten bulunuyor.';
+      }
+      if (lowerMsg.includes('phone')) {
+        return 'Bu telefon numarası ile kayıtlı bir hesap zaten bulunuyor.';
+      }
+      return 'Girdiğiniz bilgilerden bazıları zaten sistemde kayıtlı.';
+    }
+    
+    // Şifre / E-posta hataları
+    if (lowerMsg.includes('bad credentials') || lowerMsg.includes('unauthorized') || lowerMsg.includes('401')) {
+      return 'E-posta adresiniz veya şifreniz hatalı. Lütfen bilgilerinizi kontrol edin.';
+    }
+    
+    // Veritabanı ve diğer genel 500 sunucu hataları
+    if (
+      lowerMsg.includes('relation') || 
+      lowerMsg.includes('does not exist') || 
+      lowerMsg.includes('sql') || 
+      lowerMsg.includes('jdbc') || 
+      lowerMsg.includes('query') || 
+      lowerMsg.includes('hibernate') || 
+      lowerMsg.includes('mongo') || 
+      lowerMsg.includes('psqlexception') || 
+      lowerMsg.includes('feignexception') || 
+      lowerMsg.includes('internal server error') || 
+      err.status === 500
+    ) {
+      return 'İşleminiz gerçekleştirilirken geçici bir sistem hatası oluştu. Lütfen daha sonra tekrar deneyin.';
+    }
+
+    return rawMessage;
   }
 
   // isValidEmail: Basit regex e-posta format doğrulaması.

@@ -9,7 +9,7 @@ import com.omerkoc.customer.model.Customer;
 
 @Repository
 public interface CustomerRepository extends MongoRepository<Customer, String> {
-    Optional<Customer> findByEmail(String email);
+    Optional<Customer> findFirstByEmail(String email);
 
     Optional<Customer> findByPhone(String phone);
 }
