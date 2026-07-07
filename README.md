@@ -1,64 +1,64 @@
-# My Finance - Mikroservis Projesi
+# My Finance - Microservices Project
 
-Bu proje; Java 21, Spring Boot, Spring Cloud, Kafka, Angular ve Docker kullanılarak geliştirilmiş ölçeklenebilir ve modern bir finansal yönetim platformudur. Sistem kapsamında kullanıcıların kayıt olma ve giriş işlemleri (JWT bazlı), profil yönetimi, TRY/USD/EUR para birimlerinde cüzdan oluşturulması, cüzdanlar arası canlı döviz kurları ile para transferleri, para çekme/yatırma hareketleri ve tarihsel işlem geçmişi takibi gibi uçtan uca tüm finansal akışlar mikroservis standartlarında tasarlanmıştır.
+This project is a scalable, modern financial management platform built using Java 21, Spring Boot, Spring Cloud, Kafka, Angular, and Docker. The system encapsulates end-to-end financial workflows in compliance with microservices standards, including user registration and login (JWT-based), profile management, multi-currency wallet creation (TRY/USD/EUR), real-time peer-to-peer transfers with live exchange rate conversions, deposits/withdrawals, and paginated transaction history tracking.
 
 ---
 
-## 🏗️ Genel Mimari Şema
+## 🏗️ Architecture Diagram
 
-Sistem; istemci (Angular UI) isteklerinin tek bir API Geçidinden (Gateway) geçmesi, servislerin birbirini Eureka Discovery ile keşfetmesi, haberleşmelerde OpenFeign ve Kafka kullanılması üzerine kurulmuştur:
+The system is designed with a single API Gateway routing client requests, services dynamically registering and discovering each other using Eureka Discovery, and communications handled via OpenFeign and Apache Kafka:
 
 ```mermaid
 graph TD
-    %% İstemci ve Gateway
-    UI["Finance UI (Angular)"] -->|"API İstekleri"| GW[API Gateway]
+    %% Client and Gateway
+    UI["Finance UI (Angular)"] -->|"API Requests"| GW[API Gateway]
 
-    %% Altyapı Servisleri
-    CS[Config Server] -->|"Merkezi Yapılandırma"| GW
-    CS -->|"Merkezi Yapılandırma"| AS[Auth Service]
-    CS -->|"Merkezi Yapılandırma"| CUST[Customer Service]
-    CS -->|"Merkezi Yapılandırma"| WALLET[Wallet Service]
-    CS -->|"Merkezi Yapılandırma"| NOTIF[Notification Service]
+    %% Infrastructure Services
+    CS[Config Server] -->|"Central Configuration"| GW
+    CS -->|"Central Configuration"| AS[Auth Service]
+    CS -->|"Central Configuration"| CUST[Customer Service]
+    CS -->|"Central Configuration"| WALLET[Wallet Service]
+    CS -->|"Central Configuration"| NOTIF[Notification Service]
     
-    DS[Discovery Registry] <-->|"Dinamik Kayıt & Keşif"| GW
-    DS <-->|"Dinamik Kayıt & Keşif"| AS
-    DS <-->|"Dinamik Kayıt & Keşif"| CUST
-    DS <-->|"Dinamik Kayıt & Keşif"| WALLET
-    DS <-->|"Dinamik Kayıt & Keşif"| NOTIF
+    DS[Discovery Registry] <-->|"Dynamic Registration & Discovery"| GW
+    DS <-->|"Dynamic Registration & Discovery"| AS
+    DS <-->|"Dynamic Registration & Discovery"| CUST
+    DS <-->|"Dynamic Registration & Discovery"| WALLET
+    DS <-->|"Dynamic Registration & Discovery"| NOTIF
 
-    %% Gateway Yönlendirmeleri
+    %% Gateway Routing
     GW -->|"/auth/**"| AS
     GW -->|"/customers/**"| CUST
     GW -->|"/wallets/**"| WALLET
 
-    %% Servislerin Veritabanları ve Dış Dünya
-    AS -->|"Kullanıcı Bilgileri"| DB_PG[(PostgreSQL)]
-    CUST -->|"Müşteri Profilleri"| DB_MONGO[(MongoDB)]
-    WALLET -->|"Cüzdanlar & Transferler"| DB_PG[(PostgreSQL)]
-    WALLET -.->|"Scheduled Task"| EXT_API["Dış Döviz Kurları API"]
+    %% Databases and External Services
+    AS -->|"User Credentials"| DB_PG[(PostgreSQL)]
+    CUST -->|"Customer Profiles"| DB_MONGO[(MongoDB)]
+    WALLET -->|"Wallets & Transactions"| DB_PG[(PostgreSQL)]
+    WALLET -.->|"Scheduled Task"| EXT_API["External Exchange Rate API"]
 
-    %% Feign İletişimi
-    AS -.->|"Feign Client: Müşteri Profilini Aç"| CUST
+    %% Feign Communication
+    AS -.->|"Feign Client: Open Customer Profile"| CUST
 
-    %% Asenkron Olay Akışı (Kafka)
-    AS -->|"Kayıt/Giriş Eventleri"| KAFKA{{Kafka Broker}}
-    KAFKA -->|"Mesaj Tüketimi"| NOTIF
-    NOTIF -->|"SMTP Protokolü"| MAIL[Gmail SMTP Server]
+    %% Asynchronous Event Streaming (Kafka)
+    AS -->|"Registration/Login Events"| KAFKA{{Kafka Broker}}
+    KAFKA -->|"Message Consumption"| NOTIF
+    NOTIF -->|"SMTP Protocol"| MAIL[Gmail SMTP Server]
 ```
 
 ---
 
-## 🛠️ Kullanılan Teknolojiler
+## 🛠️ Technologies Used
 
-*   **Java 21** & **Spring Boot 3.x/4.x** (Arka Plan Servisleri)
-*   **Angular 17+** (Kullanıcı Arayüzü)
-*   **Spring Cloud Gateway** (API Geçidi & JWT Doğrulama)
-*   **Spring Cloud Eureka** (Hizmet Keşfi & Kayıt Defteri)
-*   **Spring Cloud Config Server** (Merkezi Yapılandırma Yönetimi)
-*   **Apache Kafka** (Servisler Arası Asenkron Mesajlaşma & Olay Akışı)
-*   **PostgreSQL** (Kullanıcı ve Cüzdan Verileri)
-*   **MongoDB** (Müşteri Profilleri)
-*   **Docker** & **Docker Compose** (Altyapı Konteynerizasyonu)
-*   **OpenFeign** & **Spring Cloud LoadBalancer** (Senkron Servisler Arası İletişim)
-*   **Spring Boot Starter Mail & JavaMailSender** (E-posta Bildirim Gönderimi)
-*   **Zipkin** (Dağıtık İstek İzleme & Trace Takibi)
+*   **Java 21** & **Spring Boot 3.x/4.x** (Backend Services)
+*   **Angular 17+** (Frontend User Interface)
+*   **Spring Cloud Gateway** (API Gateway & JWT Authentication)
+*   **Spring Cloud Eureka** (Service Registry & Discovery)
+*   **Spring Cloud Config Server** (Centralized Configuration Management)
+*   **Apache Kafka** (Asynchronous Message Broker & Event Streaming)
+*   **PostgreSQL** (User and Wallet/Transaction Data)
+*   **MongoDB** (Customer Profile Data)
+*   **Docker** & **Docker Compose** (Infrastructure Containerization)
+*   **OpenFeign** & **Spring Cloud LoadBalancer** (Synchronous Inter-Service Communication)
+*   **Spring Boot Starter Mail & JavaMailSender** (Automated Email Alerts)
+*   **Zipkin** (Distributed Tracing & Request Tracking)

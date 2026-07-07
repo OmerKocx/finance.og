@@ -4,7 +4,6 @@ import { DecimalPipe } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { WalletService } from '../services/wallet.service';
 
-// Transaction: İşlem listesi için kullanılan veri yapısı model tanımı.
 interface Transaction {
   id: string;
   title: string;
@@ -17,18 +16,16 @@ interface Transaction {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [DecimalPipe, RouterLink], // HTML içinde sayı biçimlendirme (number pipe) kullanabilmek için DecimalPipe ekliyoruz
+  imports: [DecimalPipe, RouterLink],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
 export class DashboardComponent implements OnInit {
-  // Yönlendirme ve veri oturumu işlemleri için ilgili bağımlılıkları enjekte ediyoruz
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly walletService = inject(WalletService);
 
   readonly userId = this.authService.getUserId();
-  // Oturum açmış kullanıcının adı ve baş harfleri
   readonly userName = signal(this.authService.getName() || 'Kullanıcı');
   readonly userInitials = computed(() => {
     const name = this.userName().trim();
@@ -40,13 +37,11 @@ export class DashboardComponent implements OnInit {
     return name.substring(0, 2).toUpperCase();
   });
 
-  // Finansal özet istatistiklerini tutan sinyaller (Signals)
-  readonly balance = signal(0.00); // Toplam bakiye değeri
-  readonly income = signal(0.00); // Gelir değeri
-  readonly expenses = signal(0.00); // Gider değeri
-  readonly currency = signal('₺'); // Para birimi simgesi
+  readonly balance = signal(0.00);
+  readonly income = signal(0.00);
+  readonly expenses = signal(0.00);
+  readonly currency = signal('₺');
 
-  // transactions: Arayüzde listelenecek son işlemler verisini tutan dizi sinyali.
   readonly transactions = signal<Transaction[]>([]);
 
   ngOnInit(): void {
@@ -66,7 +61,6 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Failed to load wallet on dashboard', err);
-        // Cüzdan henüz oluşturulmamışsa varsayılan olarak bakiye 0.00 gösterilir
       }
     });
   }
@@ -84,7 +78,6 @@ export class DashboardComponent implements OnInit {
         }));
         this.transactions.set(mapped);
 
-        // Son 10 işlemden gelir ve gider toplamlarını hesapla
         const inc = mapped.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
         const exp = mapped.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
         this.income.set(inc);
@@ -127,9 +120,8 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // logout: Kullanıcının oturum bilgilerini siler ve giriş sayfasına yönlendirir.
   logout(): void {
-    this.authService.clearSession(); // Tarayıcı hafızasındaki token'ı ve email'i temizler
-    this.router.navigate(['/login']); // Giriş sayfasına geri döner
+    this.authService.clearSession();
+    this.router.navigate(['/login']);
   }
 }

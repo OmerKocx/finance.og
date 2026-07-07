@@ -27,7 +27,6 @@ public class KafkaNotificationConsumer {
     }
 
 
-    // 1. Register Listener
     @KafkaListener(topics = "user-registration-topic", groupId = "${spring.kafka.consumer.group-id:notification-group}")
     public void consumeRegisterEvent(UserRegisterEvent event) {
         log.info("User registration event received: {}", event);
@@ -38,13 +37,11 @@ public class KafkaNotificationConsumer {
         emailService.sendEmail(event.email(), subject, body);
     }
 
-    // 2. Login Listener
     @KafkaListener(topics = "user-login-topic", groupId = "${spring.kafka.consumer.group-id:notification-group}")
     public void consumeLoginEvent(UserLoginEvent event) {
         log.info("User login event received: {}", event);
 
         try {
-            // Retrieve customer details from customer service using OpenFeign
             Optional<CustomerResponseDto> customerOpt = customerClient.getCustomerByEmail(event.email());
 
             if (customerOpt.isPresent()) {

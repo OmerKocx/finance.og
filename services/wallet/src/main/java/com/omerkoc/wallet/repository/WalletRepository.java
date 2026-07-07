@@ -16,8 +16,6 @@ import jakarta.persistence.LockModeType;
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
     Optional<Wallet> findByUserId(Long userId);
 
-    // ANLIK VERİYİ KİLİTLER. HATTA TABLOYU KİTLER RACE CONDİTİON OLUŞMASINI
-    // ENGELLER
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT w FROM Wallet w WHERE w.id = :id")
     Optional<Wallet> findByIdForUpdate(@Param("id") Long id);

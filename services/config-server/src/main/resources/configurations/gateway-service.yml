@@ -7,21 +7,18 @@ spring:
       server:
         webflux:
           routes:
-            # Route for Authentication Service (Public / Unsecured)
             - id: auth-service
               uri: lb://auth-service
               predicates:
                 - Path=/auth/**
 
-            # Route for Customer Service (Secured with JWT filter)
             - id: customer-service
-              uri: lb://customer-service # lb sayesinde eurekadan çeker
+              uri: lb://customer-service
               predicates:
                 - Path=/customers/**
               filters:
                 - AuthenticationFilter
 
-            # Route for Wallet Service (Secured with JWT filter)
             - id: wallet-service
               uri: lb://wallet-service
               predicates:
@@ -31,11 +28,11 @@ spring:
 management:
   endpoint:
     gateway:
-      enabled: true # gateway endpointlerini aktif eder
+      enabled: true
   endpoints:
     web:
       exposure:
-        include: "*" #  endpoinlerin  hepsini dışarı açar
+        include: "*"
 
 logging:
   level:

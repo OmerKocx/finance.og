@@ -16,18 +16,16 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer # Kafka mesaj anahtarlarını(mesela user_id diyelim) String formatında serileştirmek için
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer # kafka nesneden anlamaz onu json a çevirir
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        spring.json.type.mapping: "userRegisterEvent:com.omerkoc.auth_service.dto.UserRegisterEvent,userLoginEvent:com.omerkoc.auth_service.dto.UserLoginEvent" # Kafka mesajlarının DTO'larını eşleştirmek için
-        # userRegisterEvent olarka yoluyor işte ismi kısaltıp gömüyor
-        # spring.json.add.type.headers: false # bunu kullanırsak mesajın başına userRegisterEvent yazmadan da deşifre edebiliriz
+        spring.json.type.mapping: "userRegisterEvent:com.omerkoc.auth_service.dto.UserRegisterEvent,userLoginEvent:com.omerkoc.auth_service.dto.UserLoginEvent"
 
 application:
   security:
     jwt:
       secret-key: "LupHyt72hUvCWSoxznpeN5D96l2npsa0tzVU1rXcUwd"
-      expiration: 86400000 # default 24 hours
+      expiration: 86400000
 
 springdoc:
   api-docs:

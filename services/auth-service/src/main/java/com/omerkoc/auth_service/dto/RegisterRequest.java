@@ -28,5 +28,5 @@ public class RegisterRequest {
     @Size(min = 10, message = "Phone number must be at least 10 characters")
     private String phoneNumber;
 
-    private String role; // Optional custom role (e.g. USER, ADMIN)
+    private String role;
 }

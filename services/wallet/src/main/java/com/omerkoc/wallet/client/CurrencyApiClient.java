@@ -22,7 +22,6 @@ public class CurrencyApiClient {
             CurrencyRateDto[] response = restTemplate.getForObject(URL, CurrencyRateDto[].class);
             return response != null ? Arrays.asList(response) : Collections.emptyList();
         } catch (Exception e) {
-            // API patlarsa sistem çökmesin diye log atıp boş liste dönüyoruz
             return Collections.emptyList();
         }
     }

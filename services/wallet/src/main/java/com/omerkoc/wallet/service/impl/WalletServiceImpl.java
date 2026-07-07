@@ -4,14 +4,14 @@ import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Spring transactional tercih edilmeli
+import org.springframework.transaction.annotation.Transactional;
 
 import com.omerkoc.wallet.dto.TransactionResponseDto;
 import com.omerkoc.wallet.dto.WalletRequestDto;
 import com.omerkoc.wallet.dto.WalletResponseDto;
 import com.omerkoc.wallet.exception.WalletAlreadyExistsException;
 import com.omerkoc.wallet.exception.WalletNotFoundException;
-import com.omerkoc.wallet.exception.InsufficientBalanceException; // Bunu eklemelisin kral
+import com.omerkoc.wallet.exception.InsufficientBalanceException;
 import com.omerkoc.wallet.mapper.WalletMapper;
 import com.omerkoc.wallet.model.Wallet;
 import com.omerkoc.wallet.service.IWalletService;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true) // Okuma metotları için default performans kazancı
+@Transactional(readOnly = true)
 public class WalletServiceImpl implements IWalletService {
 
     private final WalletRepository walletRepository;
@@ -52,7 +52,7 @@ public class WalletServiceImpl implements IWalletService {
     }
 
     @Override
-    @Transactional // Veri yazacağımız için readOnly eziliyor
+    @Transactional
     public WalletResponseDto createWallet(WalletRequestDto walletRequestDto) {
         walletRepository.findByUserId(walletRequestDto.userId())
                 .ifPresent(wallet -> {
@@ -110,7 +110,6 @@ public class WalletServiceImpl implements IWalletService {
     @Transactional
     public WalletResponseDto depositMoney(Long walletId, double amount) {
         log.info("Depositing amount: {} to walletId: {}", amount, walletId);
-        // Repository'e findByIdForUpdate metodu eklemiş olmalısın (Pessimistic Lock)
         Wallet wallet = walletRepository.findByIdForUpdate(walletId)
                 .orElseThrow(() -> new WalletNotFoundException("Wallet not found with id: " + walletId));
 
@@ -118,7 +117,6 @@ public class WalletServiceImpl implements IWalletService {
         wallet.setUpdatedDate(LocalDateTime.now());
         WalletResponseDto response = mapper.toWalletResponseDto(walletRepository.save(wallet));
 
-        // Record deposit transaction
         Transaction transaction = Transaction.builder()
                 .walletId(walletId)
                 .amount(amount)
@@ -138,7 +136,6 @@ public class WalletServiceImpl implements IWalletService {
         Wallet wallet = walletRepository.findByIdForUpdate(walletId)
                 .orElseThrow(() -> new WalletNotFoundException("Wallet not found with id: " + walletId));
 
-        // Bakiyeyi burada acımadan kontrol et kral!
         if (wallet.getBalance() < amount) {
             throw new InsufficientBalanceException("Insufficient balance in wallet id: " + walletId);
         }
@@ -147,7 +144,6 @@ public class WalletServiceImpl implements IWalletService {
         wallet.setUpdatedDate(LocalDateTime.now());
         WalletResponseDto response = mapper.toWalletResponseDto(walletRepository.save(wallet));
 
-        // Record withdrawal transaction
         Transaction transaction = Transaction.builder()
                 .walletId(walletId)
                 .amount(amount)
@@ -165,8 +161,6 @@ public class WalletServiceImpl implements IWalletService {
     public void transferMoney(Long sourceWalletId, Long destinationWalletId, double amount) {
         log.info("Transferring amount: {} from {} to {}", amount, sourceWalletId, destinationWalletId);
 
-        // Kilit altındaki metotları doğrudan kod içinden işletiyoruz (Self-invocation
-        // bypass)
         Wallet sourceWallet = walletRepository.findByIdForUpdate(sourceWalletId)
                 .orElseThrow(() -> new WalletNotFoundException("Source wallet not found"));
 
@@ -186,7 +180,6 @@ public class WalletServiceImpl implements IWalletService {
         walletRepository.save(sourceWallet);
         walletRepository.save(destinationWallet);
 
-        // Record TRANSFER_OUT for source
         Transaction outTx = Transaction.builder()
                 .walletId(sourceWalletId)
                 .amount(amount)
@@ -197,7 +190,6 @@ public class WalletServiceImpl implements IWalletService {
                 .build();
         transactionRepository.save(outTx);
 
-        // Record TRANSFER_IN for destination
         Transaction inTx = Transaction.builder()
                 .walletId(destinationWalletId)
                 .amount(amount)

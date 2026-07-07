@@ -1,7 +1,6 @@
 server:
   port: 8085
 
-# Kafka Ayarları
 spring:
   kafka:
     bootstrap-servers: ${KAFKA_SERVERS}
@@ -12,13 +11,11 @@ spring:
     properties:
       spring.json.trusted.packages: "*"
       spring.json.type.mapping: "userRegisterEvent:com.omerkoc.notification.dto.UserRegisterEvent,userLoginEvent:com.omerkoc.notification.dto.UserLoginEvent"
-  # Mail Gönderim Ayarları
   mail:
-    host: smtp.gmail.com # Kullandığın SMTP sağlayıcı
+    host: smtp.gmail.com
     port: 587
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
-    # Gmail için Uygulama Şifresi
     properties:
       mail:
         smtp:

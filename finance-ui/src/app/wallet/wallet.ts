@@ -26,21 +26,17 @@ export class WalletComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  // User State
   readonly userId = this.authService.getUserId();
   readonly userName = signal(this.authService.getName() || 'Kullanıcı');
 
-  // Component State
   readonly wallet = signal<WalletResponse | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string>('');
   readonly success = signal<string>('');
 
-  // Modals state
   readonly activeModal = signal<'deposit' | 'withdraw' | 'transfer' | null>(null);
   readonly isActionLoading = signal(false);
 
-  // Form Fields
   readonly depositAmount = signal<number | null>(null);
   readonly withdrawAmount = signal<number | null>(null);
   readonly transferAmount = signal<number | null>(null);
@@ -68,7 +64,6 @@ export class WalletComponent implements OnInit {
         this.loading.set(false);
       },
       error: (err) => {
-        // If wallet not found, we can let user create one
         if (err.status === 404) {
           this.wallet.set(null);
         } else {
@@ -123,7 +118,7 @@ export class WalletComponent implements OnInit {
         this.wallet.set(res);
         this.loading.set(false);
         this.success.set('Cüzdanınız başarıyla oluşturuldu!');
-        this.transactions.set([]); // empty history initially
+        this.transactions.set([]);
         this.clearMessagesAfterDelay();
       },
       error: (err) => {
@@ -164,7 +159,6 @@ export class WalletComponent implements OnInit {
         this.isActionLoading.set(false);
         this.success.set(`${amount} ${w.currency} başarıyla yatırıldı.`);
         
-        // Refresh transaction history
         this.loadTransactionHistory(w.id);
 
         setTimeout(() => this.closeModal(), 1500);
@@ -199,7 +193,6 @@ export class WalletComponent implements OnInit {
         this.isActionLoading.set(false);
         this.success.set(`${amount} ${w.currency} başarıyla çekildi.`);
 
-        // Refresh transaction history
         this.loadTransactionHistory(w.id);
 
         setTimeout(() => this.closeModal(), 1500);
@@ -237,7 +230,6 @@ export class WalletComponent implements OnInit {
 
     this.walletService.transfer(w.id, destId, amount).subscribe({
       next: () => {
-        // Fetch updated wallet balance
         this.walletService.getWalletByUserId(this.userId!).subscribe(updated => {
           this.wallet.set(updated);
         });
@@ -245,7 +237,6 @@ export class WalletComponent implements OnInit {
         this.isActionLoading.set(false);
         this.success.set(`${amount} ${w.currency} başarıyla Cüzdan ID: ${destId} hesabına gönderildi.`);
 
-        // Refresh transaction history
         this.loadTransactionHistory(w.id);
 
         setTimeout(() => this.closeModal(), 1500);
@@ -270,7 +261,6 @@ export class WalletComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  // getErrorMessage: Sunucu hatalarını son kullanıcıya yönelik şık ve anlaşılır mesajlara dönüştürür.
   private getErrorMessage(err: any): string {
     if (!err) return '';
     
@@ -296,22 +286,18 @@ export class WalletComponent implements OnInit {
 
     const lowerMsg = rawMessage.toLowerCase();
     
-    // Sunucu kapalı veya internet yok (Status 0 veya Failed to fetch)
     if (err.status === 0 || lowerMsg.includes('failed to fetch') || lowerMsg.includes('unknown error')) {
       return 'Sunucuyla bağlantı kurulamadı. Lütfen internet bağlantınızı kontrol edin veya daha sonra tekrar deneyin.';
     }
     
-    // Mükerrer / Zaten kayıtlı bilgileri
     if (lowerMsg.includes('duplicate key') || lowerMsg.includes('incorrectresultsizedataaccessexception') || lowerMsg.includes('already exists')) {
       return 'Bu işlem gerçekleştirilemedi, girdiğiniz benzersiz bilgiler sistemde zaten mevcut.';
     }
     
-    // Yetki hataları
     if (lowerMsg.includes('bad credentials') || lowerMsg.includes('unauthorized') || lowerMsg.includes('401')) {
       return 'Bu işlemi gerçekleştirmek için yetkiniz bulunmamaktadır.';
     }
     
-    // Veritabanı ve diğer genel 500 sunucu hataları
     if (
       lowerMsg.includes('relation') || 
       lowerMsg.includes('does not exist') || 
