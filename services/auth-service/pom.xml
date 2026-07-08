@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.1.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/> 
 	</parent>
 	<groupId>com.omerkoc</groupId>
 	<artifactId>auth-service</artifactId>
@@ -70,7 +70,6 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- JWT dependencies -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -89,7 +88,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Distributed Tracing (Zipkin via OpenTelemetry) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>

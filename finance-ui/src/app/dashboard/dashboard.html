@@ -1,7 +1,6 @@
 <div class="dashboard-container">
   <div class="ambient-bg"></div>
 
-  <!-- Header Nav -->
   <header class="dash-header">
     <div class="header-left">
       <div class="brand-logo">
@@ -36,12 +35,9 @@
     </div>
   </header>
 
-  <!-- Main Content Grid -->
   <main class="dash-content">
     
-    <!-- Top Grid: Balance Cards -->
     <section class="overview-grid">
-      <!-- Main Wallet Card (Elegant Dark Metallic) -->
       <div class="overview-card main-balance-card">
         <span class="card-label">Toplam Bakiye</span>
         <h2 class="balance-value">{{ balance() | number:'1.2-2' }}{{ currency() }}</h2>
@@ -51,7 +47,6 @@
         </div>
       </div>
 
-      <!-- Income Card -->
       <div class="overview-card sub-card income-card">
         <div class="card-header-row">
           <span class="card-label">Aylık Gelir</span>
@@ -66,7 +61,6 @@
         <p class="stat-trend text-emerald">↑ Geçen aya göre %12 artış</p>
       </div>
 
-      <!-- Expense Card -->
       <div class="overview-card sub-card expense-card">
         <div class="card-header-row">
           <span class="card-label">Aylık Gider</span>
@@ -82,9 +76,7 @@
       </div>
     </section>
 
-    <!-- Mid Grid: Analytics Chart and Recent Transactions -->
     <section class="details-grid">
-      <!-- SVG Analytics Chart -->
       <div class="grid-card chart-card">
         <div class="card-title-row">
           <h3>Haftalık Akış Analizi</h3>
@@ -93,12 +85,10 @@
         
         <div class="chart-container">
           <svg class="cashflow-chart" viewBox="0 0 500 200" preserveAspectRatio="none">
-            <!-- Grid lines -->
             <line x1="0" y1="50" x2="500" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
             <line x1="0" y1="100" x2="500" y2="100" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
             <line x1="0" y1="150" x2="500" y2="150" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
             
-            <!-- Gradient area below the line -->
             <defs>
               <linearGradient id="chartGlow" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="rgba(37, 99, 235, 0.1)" />
@@ -107,10 +97,8 @@
             </defs>
             <path d="M 0 160 Q 100 80, 200 110 T 400 60 T 500 40 L 500 200 L 0 200 Z" fill="url(#chartGlow)" />
             
-            <!-- Sleek curve path -->
             <path d="M 0 160 Q 100 80, 200 110 T 400 60 T 500 40" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" />
             
-            <!-- Clean data point circles -->
             <circle cx="200" cy="110" r="4" fill="var(--bg-dark)" stroke="var(--primary)" stroke-width="2" />
             <circle cx="500" cy="40" r="4" fill="var(--primary)" stroke="var(--text-primary)" stroke-width="1.5" />
           </svg>
@@ -127,7 +115,6 @@
         </div>
       </div>
 
-      <!-- Recent Transactions Feed -->
       <div class="grid-card transactions-card">
         <div class="card-title-row">
           <h3>Son İşlemler</h3>
@@ -138,7 +125,6 @@
           @for (tx of transactions(); track tx.id) {
             <div class="transaction-item anim-fade-in">
               <div class="tx-left">
-                <!-- Conditional color circle based on type -->
                 <div class="category-icon" [class.income-circle]="tx.type === 'income'" [class.expense-circle]="tx.type === 'expense'">
                   @if (tx.type === 'income') {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -1,29 +1,27 @@
-/* Custom Global Design Tokens and Ambient Background */
 
 :root {
   --font-primary: 'Plus Jakarta Sans', 'Inter', sans-serif;
   --font-secondary: 'Inter', sans-serif;
 
-  /* Colors: Humanized, premium light mode palette (Slate-based) */
-  --bg-dark: #f8fafc; /* Very light slate gray neutral background */
-  --bg-card: #ffffff; /* Pure white card background */
-  --bg-card-hover: #f1f5f9; /* Slate-100 hover state */
-  --border-glass: #e2e8f0; /* Thin border slate-200 */
-  --border-glass-focus: #2563eb; /* Elegant royal blue border highlight for focus states */
+  --bg-dark: #f8fafc; 
+  --bg-card: #ffffff; 
+  --bg-card-hover: #f1f5f9; 
+  --border-glass: #e2e8f0; 
+  --border-glass-focus: #2563eb; 
   
-  --primary: #2563eb; /* Royal Blue */
-  --primary-hover: #1d4ed8; /* Active royal blue */
+  --primary: #2563eb; 
+  --primary-hover: #1d4ed8; 
   --primary-glow: rgba(37, 99, 235, 0.1);
   
   --secondary: #f1f5f9; 
   --secondary-glow: rgba(0, 0, 0, 0.05);
 
-  --accent-rose: #3b82f6; /* Blue accent */
+  --accent-rose: #3b82f6; 
   --accent-red: #2563eb;
   
-  --text-primary: #0f172a; /* Deep dark slate for headers */
-  --text-secondary: #475569; /* Slate secondary for general text */
-  --text-muted: #64748b; /* Cool gray for captions */
+  --text-primary: #0f172a; 
+  --text-secondary: #475569; 
+  --text-muted: #64748b; 
 
   --success: #10b981;
   --error: #ef4444;
@@ -46,7 +44,6 @@ body {
   position: relative;
 }
 
-/* Beautiful custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -65,7 +62,6 @@ body {
   background: rgba(0, 0, 0, 0.15);
 }
 
-/* Elegant Static Background */
 .ambient-bg {
   position: fixed;
   top: 0;
@@ -76,7 +72,6 @@ body {
   overflow: hidden;
   background-color: var(--bg-dark);
   
-  /* Very subtle modern light-blue vignette for premium fintech aesthetics */
   background-image: 
     radial-gradient(circle at top right, rgba(37, 99, 235, 0.06), transparent 50%),
     radial-gradient(circle at bottom left, rgba(241, 245, 249, 0.8), transparent 60%);

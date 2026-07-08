@@ -1,13 +1,10 @@
 <div class="auth-container">
-  <!-- Glowing blobs strictly scoped inside the container to overlay correctly -->
   <div class="ambient-bg"></div>
 
   <div class="auth-card-wrapper">
     <div class="auth-card">
-      <!-- Card Header / Brand -->
       <div class="auth-header">
         <div class="brand-logo">
-          <!-- Sleek monochrome geometric logo -->
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -32,7 +29,6 @@
         </p>
       </div>
 
-      <!-- Alerts -->
       @if (errorMessage()) {
         <div class="alert alert-error">
           <svg
@@ -70,10 +66,8 @@
         </div>
       }
 
-      <!-- Main Form -->
       <form (submit)="onSubmit(); $event.preventDefault()" class="auth-form">
         @if (!isLogin()) {
-          <!-- Name Field -->
           <div class="form-group anim-fade-in">
             <label for="name">Ad Soyad</label>
             <div class="input-wrapper">
@@ -101,7 +95,6 @@
             </div>
           </div>
 
-          <!-- Phone Field -->
           <div class="form-group anim-fade-in">
             <label for="phone">Telefon Numarası</label>
             <div class="input-wrapper">
@@ -131,7 +124,6 @@
           </div>
         }
 
-        <!-- Email Field -->
         <div class="form-group">
           <label for="email">E-posta Adresi</label>
           <div class="input-wrapper">
@@ -161,7 +153,6 @@
           </div>
         </div>
 
-        <!-- Password Field -->
         <div class="form-group">
           <div class="label-row">
             <label for="password">Şifre</label>
@@ -227,7 +218,6 @@
             </button>
           </div>
 
-          <!-- Password Strength Indicator (Register Mode Only) -->
           @if (!isLogin() && password()) {
             <div class="strength-meter anim-fade-in">
               <div class="meter-bars">
@@ -262,7 +252,6 @@
           }
         </div>
 
-        <!-- Confirm Password Field (Register Mode Only) -->
         @if (!isLogin()) {
           <div class="form-group anim-fade-in">
             <label for="confirmPassword">Şifreyi Onayla</label>
@@ -292,7 +281,6 @@
           </div>
         }
 
-        <!-- Remember Me (Login Mode Only) -->
         @if (isLogin()) {
           <div class="form-options">
             <label class="checkbox-container">
@@ -308,7 +296,6 @@
           </div>
         }
 
-        <!-- Submit Button -->
         <button type="submit" class="submit-btn" [disabled]="loading()">
           @if (loading()) {
             <span class="loader-spinner"></span>
@@ -319,7 +306,6 @@
         </button>
       </form>
 
-      <!-- Toggle Mode Link -->
       <div class="auth-footer">
         @if (isLogin()) {
           <p>

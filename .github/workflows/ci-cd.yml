@@ -8,7 +8,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    # İşte burası o meşhur Matrix! Robot bu listeyi alıp paralel evrenler açacak.
     strategy:
       matrix:
         service:
@@ -26,7 +25,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Java 21 Ayarı
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -34,12 +32,10 @@ jobs:
           distribution: "temurin"
           cache: maven
 
-      # Matrix sayesinde ${{ matrix.service }} yazarak dinamik olarak sırayla her klasöre giriyor
       - name: Build ${{ matrix.service }}
         working-directory: ./services/${{ matrix.service }}
         run: mvn clean package -DskipTests=true
 
-  # Docker compose kontrolünü ayrı bir iş olarak dışarı aldık ki servis derlemeleriyle çakışmasın
   check-docker-compose:
     runs-on: ubuntu-latest
     steps:

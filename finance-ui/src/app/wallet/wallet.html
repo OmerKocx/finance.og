@@ -1,7 +1,6 @@
 <div class="dashboard-container">
   <div class="ambient-bg"></div>
 
-  <!-- Header Nav -->
   <header class="dash-header">
     <div class="header-left">
       <div class="brand-logo">
@@ -36,10 +35,8 @@
     </div>
   </header>
 
-  <!-- Main Content Area -->
   <main class="dash-content">
     
-    <!-- Toast Notifications -->
     @if (success()) {
       <div class="alert alert-success anim-fade-in">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 8 12 12 16 14"></polyline></svg>
@@ -53,7 +50,6 @@
       </div>
     }
 
-    <!-- Loading State -->
     @if (loading()) {
       <div class="loading-wrapper">
         <div class="spinner"></div>
@@ -61,7 +57,6 @@
       </div>
     } @else {
       
-      <!-- Wallet Not Created State -->
       @if (!wallet()) {
         <div class="no-wallet-container anim-fade-in">
           <div class="wallet-icon-glow">
@@ -94,11 +89,8 @@
         </div>
       } @else {
         
-        <!-- Active Wallet View -->
         <section class="wallet-layout anim-fade-in">
-          <!-- Left Column: Card & Actions -->
           <div class="wallet-card-panel">
-            <!-- Premium Physical Metallic Card -->
             <div class="metallic-card-glow">
               <div class="metallic-card">
                 <div class="card-glass-glow"></div>
@@ -130,7 +122,6 @@
               </div>
             </div>
 
-            <!-- Quick Action Buttons -->
             <div class="actions-grid">
               <button class="action-btn btn-deposit" (click)="openModal('deposit')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -157,7 +148,6 @@
             </div>
           </div>
 
-          <!-- Right Column: Recent Activity Feed -->
           <div class="wallet-history-panel">
             <div class="panel-header">
               <h3>Cüzdan Hareketleri</h3>
@@ -204,14 +194,11 @@
   </main>
 </div>
 
-<!-- ================= MODALS ================= -->
 
-<!-- Backdrop Overlay -->
 @if (activeModal()) {
   <div class="modal-backdrop" (click)="closeModal()"></div>
 }
 
-<!-- Deposit Modal -->
 @if (activeModal() === 'deposit') {
   <div class="modal-card anim-slide-up">
     <div class="modal-header">
@@ -236,7 +223,6 @@
   </div>
 }
 
-<!-- Withdraw Modal -->
 @if (activeModal() === 'withdraw') {
   <div class="modal-card anim-slide-up">
     <div class="modal-header">
@@ -261,7 +247,6 @@
   </div>
 }
 
-<!-- Transfer Modal -->
 @if (activeModal() === 'transfer') {
   <div class="modal-card anim-slide-up">
     <div class="modal-header">

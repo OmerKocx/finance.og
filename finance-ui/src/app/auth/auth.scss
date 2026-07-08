@@ -62,7 +62,6 @@
   }
 }
 
-/* Alert Styles */
 .alert {
   display: flex;
   align-items: flex-start;
@@ -93,7 +92,6 @@
   color: #34d399;
 }
 
-/* Form Layout */
 .auth-form {
   display: flex;
   flex-direction: column;
@@ -198,7 +196,6 @@
   }
 }
 
-/* Password Strength Meter */
 .strength-meter {
   display: flex;
   flex-direction: column;
@@ -238,7 +235,6 @@
   }
 }
 
-/* Checkbox Style */
 .form-options {
   display: flex;
   align-items: center;
@@ -309,7 +305,6 @@
   }
 }
 
-/* Button & Spinner */
 .submit-btn {
   background: var(--primary);
   color: white;
@@ -349,7 +344,6 @@
   animation: spin 0.8s linear infinite;
 }
 
-/* Footer Section */
 .auth-footer {
   text-align: center;
   margin-top: 1.5rem;

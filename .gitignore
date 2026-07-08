@@ -1,15 +1,12 @@
-# --- Çevre Değişkenleri ve Gizli Dosyalar ---
 .env
 .env.local
 *.env
 
-# --- Maven ve Derleme Çıktıları ---
 target/
 *.jar
 *.war
 *.ear
 
-# --- IDE ve Editör Ayarları ---
 .idea/
 *.iml
 .vscode/
@@ -20,9 +17,7 @@ target/
 *.sln
 *.swp
 
-# --- İşletim Sistemi Kalıntıları ---
 Thumbs.db
 .DS_Store
 
-# --- Docker ---
 .docker/
