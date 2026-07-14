@@ -46,7 +46,7 @@ public class KafkaNotificationConsumer {
 
             if (customerOpt.isPresent()) {
                 CustomerResponseDto customer = customerOpt.get();
-                String fullName = customer.firstName() + " " + customer.lastName();
+                String fullName = customer.name();
 
                 String subject = "Security Alert: New Login Detected";
                 String body = "Hello " + fullName + ",\n\n" +
